@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Music Note Foreground with Apple-like Gradient -->
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="0.5"
+        android:scaleY="0.5">
+        <path
+            android:fillColor="#FA2D55"
+            android:pathData="M75.6,26.5L38.4,32.7V72.1C35.9,70.5 32.8,69.5 29.5,69.5C21.5,69.5 15,75.4 15,82.8C15,90.1 21.5,96 29.5,96C37.5,96 44,90.1 44,82.8V53.2L68.6,49.1V63C66.1,61.4 63,60.4 59.7,60.4C51.7,60.4 45.2,66.3 45.2,73.7C45.2,81 51.7,86.9 59.7,86.9C67.7,86.9 74.2,81 74.2,73.7V31.4L75.6,31.2V26.5Z" />
+    </group>
+</vector>
