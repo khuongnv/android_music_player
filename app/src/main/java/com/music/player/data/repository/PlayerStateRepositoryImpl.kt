@@ -24,6 +24,7 @@ class PlayerStateRepositoryImpl @Inject constructor(
 
     private object PreferencesKeys {
         val SONG_ID = longPreferencesKey("song_id")
+        val QUEUE_IDS = stringPreferencesKey("queue_ids")
         val PLAYLIST_ID = longPreferencesKey("playlist_id")
         val POSITION = longPreferencesKey("position")
         val IS_PLAYING = booleanPreferencesKey("is_playing")
@@ -48,6 +49,7 @@ class PlayerStateRepositoryImpl @Inject constructor(
     override suspend fun savePlayerState(state: PlayerState) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.SONG_ID] = state.songId
+            preferences[PreferencesKeys.QUEUE_IDS] = state.queueIds.joinToString(",")
             preferences[PreferencesKeys.PLAYLIST_ID] = state.playlistId
             preferences[PreferencesKeys.POSITION] = state.position
             preferences[PreferencesKeys.IS_PLAYING] = state.isPlaying
@@ -63,8 +65,16 @@ class PlayerStateRepositoryImpl @Inject constructor(
     }
 
     private fun mapPlayerState(preferences: Preferences): PlayerState {
+        val queueString = preferences[PreferencesKeys.QUEUE_IDS] ?: ""
+        val queueIds = if (queueString.isNotEmpty()) {
+            queueString.split(",").mapNotNull { it.toLongOrNull() }
+        } else {
+            emptyList()
+        }
+
         return PlayerState(
             songId = preferences[PreferencesKeys.SONG_ID] ?: -1L,
+            queueIds = queueIds,
             playlistId = preferences[PreferencesKeys.PLAYLIST_ID] ?: -1L,
             position = preferences[PreferencesKeys.POSITION] ?: 0L,
             isPlaying = preferences[PreferencesKeys.IS_PLAYING] ?: false,

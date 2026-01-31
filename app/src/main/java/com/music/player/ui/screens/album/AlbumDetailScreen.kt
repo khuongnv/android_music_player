@@ -97,21 +97,15 @@ fun AlbumDetailScreen(
                                     .background(MaterialTheme.colorScheme.surfaceVariant),
                                 contentAlignment = Alignment.Center
                             ) {
-                                if (album.albumArtUri != null) {
-                                    AsyncImage(
-                                        model = album.albumArtUri,
-                                        contentDescription = album.name,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier.fillMaxSize()
-                                    )
-                                } else {
-                                    Icon(
-                                        imageVector = Icons.Default.PlayArrow,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(64.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
-                                    )
-                                }
+                                AsyncImage(
+                                    model = album.albumArtUri,
+                                    contentDescription = album.name,
+                                    contentScale = ContentScale.Crop,
+                                    placeholder = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                                    error = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                                    fallback = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                                    modifier = Modifier.fillMaxSize()
+                                )
                             }
 
                             Spacer(modifier = Modifier.height(26.dp))

@@ -25,6 +25,34 @@ class SettingsViewModel @Inject constructor(
 
     init {
         loadFolders()
+        observeSleepTimerSettings()
+    }
+
+    private fun observeSleepTimerSettings() {
+        viewModelScope.launch {
+            combine(
+                settingsRepository.sleepTimerEnabled,
+                settingsRepository.sleepTimerDuration
+            ) { enabled, duration ->
+                Triple(enabled, duration, System.currentTimeMillis())
+            }.collect { (enabled, duration, currentTime) ->
+                val endTimeString = if (enabled && duration > 0) {
+                    val endTimeMillis = currentTime + (duration * 60 * 1000L)
+                    val formatter = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+                    formatter.format(java.util.Date(endTimeMillis))
+                } else {
+                    null
+                }
+                
+                _uiState.update { 
+                    it.copy(
+                        sleepTimerEnabled = enabled,
+                        sleepTimerDuration = duration.toString(),
+                        sleepTimerEndTime = endTimeString
+                    ) 
+                }
+            }
+        }
     }
 
     fun loadFolders() {
@@ -39,6 +67,27 @@ class SettingsViewModel @Inject constructor(
                 }
                 _uiState.update { it.copy(folders = foldersInfo) }
             }
+        }
+    }
+
+    fun setSleepTimerEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setSleepTimerEnabled(enabled)
+            // If we are disabling, we might want to ensure the service knows immediately, 
+            // but the repository update will trigger the flow in the service anyway.
+        }
+    }
+
+    fun setSleepTimerDuration(durationStr: String) {
+        // Validation: only allow numbers
+        if (durationStr.all { it.isDigit() }) {
+             _uiState.update { it.copy(sleepTimerDuration = durationStr) } // Update UI immediately
+             val duration = durationStr.toIntOrNull()
+             if (duration != null && duration > 0) {
+                 viewModelScope.launch {
+                     settingsRepository.setSleepTimerDuration(duration)
+                 }
+             }
         }
     }
 

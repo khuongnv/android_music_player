@@ -5,6 +5,7 @@ package com.music.player.domain.model
  */
 data class PlayerState(
     val songId: Long = -1L,
+    val queueIds: List<Long> = emptyList(),
     val playlistId: Long = -1L,
     val position: Long = 0L,
     val isPlaying: Boolean = false,

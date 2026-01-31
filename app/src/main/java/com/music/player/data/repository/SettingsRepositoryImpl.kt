@@ -26,6 +26,8 @@ class SettingsRepositoryImpl @Inject constructor(
 
     private object PreferencesKeys {
         val SELECTED_FOLDERS = stringSetPreferencesKey("selected_folders")
+        val SLEEP_TIMER_ENABLED = androidx.datastore.preferences.core.booleanPreferencesKey("sleep_timer_enabled")
+        val SLEEP_TIMER_DURATION = androidx.datastore.preferences.core.intPreferencesKey("sleep_timer_duration")
     }
 
     override val selectedFolders: Flow<Set<String>> = context.settingsDataStore.data
@@ -48,5 +50,33 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun getSelectedFolders(): Set<String> {
         return selectedFolders.first()
+    }
+
+    override val sleepTimerEnabled: Flow<Boolean> = context.settingsDataStore.data
+        .catch { exception ->
+            if (exception is IOException) emit(emptyPreferences()) else throw exception
+        }
+        .map { preferences ->
+            preferences[PreferencesKeys.SLEEP_TIMER_ENABLED] ?: false
+        }
+
+    override suspend fun setSleepTimerEnabled(enabled: Boolean) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[PreferencesKeys.SLEEP_TIMER_ENABLED] = enabled
+        }
+    }
+
+    override val sleepTimerDuration: Flow<Int> = context.settingsDataStore.data
+        .catch { exception ->
+            if (exception is IOException) emit(emptyPreferences()) else throw exception
+        }
+        .map { preferences ->
+            preferences[PreferencesKeys.SLEEP_TIMER_DURATION] ?: 30
+        }
+
+    override suspend fun setSleepTimerDuration(minutes: Int) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[PreferencesKeys.SLEEP_TIMER_DURATION] = minutes
+        }
     }
 }

@@ -9,5 +9,8 @@ data class FolderInfo(
 data class SettingsUiState(
     val folders: List<FolderInfo> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val sleepTimerEnabled: Boolean = false,
+    val sleepTimerDuration: String = "30",
+    val sleepTimerEndTime: String? = null
 )

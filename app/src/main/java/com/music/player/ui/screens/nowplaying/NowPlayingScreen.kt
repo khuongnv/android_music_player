@@ -126,21 +126,15 @@ fun NowPlayingScreen(
                     .background(Color.DarkGray),
                 contentAlignment = Alignment.Center
             ) {
-                if (currentSong?.albumArtUri != null) {
-                    AsyncImage(
-                        model = currentSong?.albumArtUri,
-                        contentDescription = "Album Art",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.MusicNote,
-                        contentDescription = null,
-                        modifier = Modifier.size(120.dp),
-                        tint = Color.White.copy(alpha = 0.2f)
-                    )
-                }
+                AsyncImage(
+                    model = currentSong?.albumArtUri,
+                    contentDescription = "Album Art",
+                    contentScale = ContentScale.Crop,
+                    placeholder = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                    error = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                    fallback = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             Spacer(modifier = Modifier.weight(1f))

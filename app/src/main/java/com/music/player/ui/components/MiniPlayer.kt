@@ -89,21 +89,15 @@ fun MiniPlayer(
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (song.albumArtUri != null) {
-                                AsyncImage(
-                                    model = song.albumArtUri,
-                                    contentDescription = song.album,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Default.MusicNote,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(28.dp)
-                                )
-                            }
+                            AsyncImage(
+                                model = song.albumArtUri,
+                                contentDescription = song.album,
+                                contentScale = ContentScale.Crop,
+                                placeholder = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                                error = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                                fallback = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                                modifier = Modifier.fillMaxSize()
+                            )
                         }
 
                         Spacer(modifier = Modifier.width(14.dp))

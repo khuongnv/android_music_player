@@ -104,6 +104,64 @@ fun SettingsScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 10.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                ) {
+                    Column(modifier = Modifier.padding(15.dp)) {
+                        Text(
+                            text = "Sleep Timer",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Enable Sleep Timer",
+                                modifier = Modifier.weight(1f),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Switch(
+                                checked = uiState.sleepTimerEnabled,
+                                onCheckedChange = { viewModel.setSleepTimerEnabled(it) }
+                            )
+                        }
+                        
+                        androidx.compose.animation.AnimatedVisibility(visible = uiState.sleepTimerEnabled) {
+                            Column(modifier = Modifier.padding(top = 8.dp)) {
+                                OutlinedTextField(
+                                    value = uiState.sleepTimerDuration,
+                                    onValueChange = { viewModel.setSleepTimerDuration(it) },
+                                    label = { Text("Duration (minutes)") },
+                                    singleLine = true,
+                                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                                    ),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                Text(
+                                    text = if (uiState.sleepTimerEndTime != null) 
+                                        "Music will pause at ${uiState.sleepTimerEndTime}" 
+                                    else 
+                                        "Music will pause after ${uiState.sleepTimerDuration} minutes.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(20.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))

@@ -50,21 +50,15 @@ fun AlbumCard(
                 .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
-            if (album.albumArtUri != null) {
-                AsyncImage(
-                    model = album.albumArtUri,
-                    contentDescription = album.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Album,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
+            AsyncImage(
+                model = album.albumArtUri,
+                contentDescription = album.name,
+                contentScale = ContentScale.Crop,
+                placeholder = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                error = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                fallback = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                modifier = Modifier.fillMaxSize()
+            )
         }
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -121,21 +115,15 @@ fun LargeAlbumCard(
                 .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
-            if (album.albumArtUri != null) {
-                AsyncImage(
-                    model = album.albumArtUri,
-                    contentDescription = album.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Album,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(64.dp)
-                )
-            }
+            AsyncImage(
+                model = album.albumArtUri,
+                contentDescription = album.name,
+                contentScale = ContentScale.Crop,
+                placeholder = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                error = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                fallback = androidx.compose.ui.res.painterResource(com.music.player.R.drawable.ic_default_album_art),
+                modifier = Modifier.fillMaxSize()
+            )
         }
 
         Spacer(modifier = Modifier.height(14.dp))

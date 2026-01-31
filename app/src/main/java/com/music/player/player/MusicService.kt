@@ -26,6 +26,7 @@ class MusicService : MediaSessionService() {
 
     @Inject lateinit var playerStateRepository: PlayerStateRepository
     @Inject lateinit var musicRepository: MusicRepository
+    @Inject lateinit var settingsRepository: com.music.player.domain.repository.SettingsRepository
 
     private var mediaSession: MediaSession? = null
     private var player: ExoPlayer? = null
@@ -34,6 +35,9 @@ class MusicService : MediaSessionService() {
     // We use Dispatchers.Main because ExoPlayer must be accessed from the main thread
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var autosaveJob: Job? = null
+    
+    // Sleep Timer
+    private var sleepTimerJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -79,6 +83,37 @@ class MusicService : MediaSessionService() {
         serviceScope.launch {
             restorePlayerState()
             startAutosaveTicker()
+            observeSleepTimer()
+        }
+    }
+
+    private fun observeSleepTimer() {
+        serviceScope.launch {
+            // Combine enabled and duration to react to changes
+            kotlinx.coroutines.flow.combine(
+                settingsRepository.sleepTimerEnabled,
+                settingsRepository.sleepTimerDuration
+            ) { enabled, duration ->
+                Pair(enabled, duration)
+            }.collect { (enabled, duration) ->
+                manageSleepTimer(enabled, duration)
+            }
+        }
+    }
+
+    private fun manageSleepTimer(enabled: Boolean, durationMinutes: Int) {
+        sleepTimerJob?.cancel()
+        if (enabled && durationMinutes > 0) {
+            Log.d("MusicApp", "MusicService: Sleep timer started for $durationMinutes minutes")
+            sleepTimerJob = serviceScope.launch {
+                delay(durationMinutes * 60 * 1000L)
+                Log.d("MusicApp", "MusicService: Sleep timer expired. Pausing playback.")
+                player?.pause()
+                // Disable timer after it fires
+                settingsRepository.setSleepTimerEnabled(false)
+            }
+        } else {
+            Log.d("MusicApp", "MusicService: Sleep timer disabled")
         }
     }
 
@@ -97,8 +132,17 @@ class MusicService : MediaSessionService() {
         val currentMediaItem = currentPlayer.currentMediaItem
         val songId = currentMediaItem?.mediaId?.toLongOrNull() ?: -1L
         
+        // Capture all song IDs in the current playlist
+        val queueIds = ArrayList<Long>()
+        val itemCount = currentPlayer.mediaItemCount
+        for (i in 0 until itemCount) {
+            val item = currentPlayer.getMediaItemAt(i)
+            item.mediaId.toLongOrNull()?.let { queueIds.add(it) }
+        }
+
         val state = PlayerState(
             songId = songId,
+            queueIds = queueIds,
             position = currentPlayer.currentPosition,
             isPlaying = currentPlayer.isPlaying,
             repeatMode = currentPlayer.repeatMode,
@@ -109,7 +153,7 @@ class MusicService : MediaSessionService() {
         withContext(Dispatchers.IO) {
             playerStateRepository.savePlayerState(state)
         }
-        Log.d("MusicApp", "MusicService: State saved at position ${state.position}, songId: $songId")
+        Log.d("MusicApp", "MusicService: State saved. Song: $songId, Queue size: ${queueIds.size}")
     }
 
     private suspend fun restorePlayerState() {
@@ -117,8 +161,41 @@ class MusicService : MediaSessionService() {
             playerStateRepository.getLatestState()
         }
         
-        if (state.songId != -1L) {
-            Log.d("MusicApp", "MusicService: Restoring state for songId ${state.songId} at ${state.position}")
+        if (state.queueIds.isNotEmpty()) {
+            Log.d("MusicApp", "MusicService: Restoring queue with ${state.queueIds.size} songs")
+            val allSongs = withContext(Dispatchers.IO) {
+                musicRepository.getAllSongs()
+            }
+            
+            // Reconstruct the queue in the correct order
+            val queueSongs = state.queueIds.mapNotNull { id ->
+                allSongs.find { it.id == id }
+            }
+
+            if (queueSongs.isNotEmpty()) {
+                player?.apply {
+                    setMediaItems(queueSongs.map { it.toMediaItem() })
+                    
+                    // Find the index of the previously playing song
+                    val initialWindowIndex = state.queueIds.indexOf(state.songId).takeIf { it != -1 } ?: 0
+                    
+                    seekTo(initialWindowIndex, state.position)
+                    repeatMode = state.repeatMode
+                    shuffleModeEnabled = state.shuffleModeEnabled
+                    setPlaybackParameters(PlaybackParameters(state.playbackSpeed))
+                    
+                    // Requirement: Always restore in PAUSED state
+                    playWhenReady = false
+                    prepare()
+                }
+                Log.d("MusicApp", "MusicService: Queue successfully restored")
+            } else {
+                Log.w("MusicApp", "MusicService: Failed to resolve songs from saved queue IDs")
+            }
+
+        } else if (state.songId != -1L) {
+            // Fallback for old state without queue
+            Log.d("MusicApp", "MusicService: Restoring single song state (legacy)")
             val song = withContext(Dispatchers.IO) {
                 musicRepository.getSongById(state.songId)
             }
@@ -135,7 +212,7 @@ class MusicService : MediaSessionService() {
                     playWhenReady = false
                     prepare()
                 }
-                Log.d("MusicApp", "MusicService: State successfully restored")
+                Log.d("MusicApp", "MusicService: Single song state restored")
             } ?: Log.w("MusicApp", "MusicService: Saved song not found in repository")
         }
     }
