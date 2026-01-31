@@ -24,6 +24,10 @@ The **Android Offline Music Player** is a local-only music player. It does not s
     - Notification and Lockscreen controls.
     - Shuffle and Repeat modes (Off / One / All).
     - Smooth seeking functionality even when paused.
+    - **Sleep Timer**: Schedule playback to pause automatically (customizable duration).
+- **Visual Improvements**:
+    - **Adaptive App Icon**: Redesigned icon with 80% scale and premium Apple Music Red aesthetics.
+    - **Default Album Art**: Elegant fallback for songs without embedded cover art.
 - **Mini Player**: A persistent player floating above the navigation bar for quick access.
 - **State Persistence**: Remembers your last played song, position, and playback modes using Jetpack DataStore.
 - **Light / Dark Mode**: Full support for system-wide theme switching.

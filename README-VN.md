@@ -24,6 +24,10 @@ Một ứng dụng phát nhạc offline cao cấp cho Android, được lấy c�
     - Điều khiển thông qua thông báo (Notification) và màn hình khóa.
     - Chế độ Shuffle (Phát ngẫu nhiên) và Repeat (Lặp lại: Tắt / Một bài / Tất cả).
     - Tính năng tua (seek) mượt mà ngay cả khi đang tạm dừng.
+    - **Hẹn giờ tắt nhạc (Sleep Timer)**: Tự động tắt nhạc sau một khoảng thời gian tùy chỉnh.
+- **Cải tiến giao diện**:
+    - **Icon ứng dụng mới**: Thiết kế adaptive với tỷ lệ 80% trên nền đỏ Apple Music thời thượng.
+    - **Ảnh bìa mặc định**: Hiển thị ảnh thay thế tinh tế cho các bài hát không có ảnh bìa.
 - **Mini Player**: Trình phát nhỏ gọn luôn hiển thị phía trên thanh điều hướng để truy cập nhanh.
 - **Lưu trữ trạng thái**: Ghi nhớ bài hát cuối cùng, vị trí phát và các chế độ phát bằng Jetpack DataStore.
 - **Chế độ Sáng / Tối**: Hỗ trợ đầy đủ việc chuyển đổi giao diện theo hệ thống.
