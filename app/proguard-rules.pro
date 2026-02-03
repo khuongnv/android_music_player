@@ -6,7 +6,7 @@
 -keep class androidx.media3.** { *; }
 
 # Keep Room entities
--keep class com.music.player.data.local.room.entity.** { *; }
+-keep class com.apple.android.music.data.local.room.entity.** { *; }
 
 # Hilt
 -keepclassmembers class * {

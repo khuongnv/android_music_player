@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.music.player"
+    namespace = "com.apple.android.music"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.music.player"
+        applicationId = "com.apple.android.music"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

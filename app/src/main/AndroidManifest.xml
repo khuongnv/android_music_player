@@ -12,6 +12,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <attribution
+        android:tag="media_playback"
+        android:label="@string/attribution_media_playback" />
+
     <application
         android:name=".MusicApp"
         android:enableOnBackInvokedCallback="true"
