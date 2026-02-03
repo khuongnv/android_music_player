@@ -129,7 +129,7 @@ fun NowPlayingScreen(
                 AsyncImage(
                     model = currentSong?.albumArtUri,
                     contentDescription = "Album Art",
-                    contentScale = ContentScale.Crop,
+                    contentScale = ContentScale.Fit,
                     placeholder = androidx.compose.ui.res.painterResource(com.apple.android.music.R.drawable.ic_default_album_art),
                     error = androidx.compose.ui.res.painterResource(com.apple.android.music.R.drawable.ic_default_album_art),
                     fallback = androidx.compose.ui.res.painterResource(com.apple.android.music.R.drawable.ic_default_album_art),

@@ -135,10 +135,8 @@ fun AlbumDetailScreen(
                                 AsyncImage(
                                     model = album.albumArtUri,
                                     contentDescription = album.name,
-                                    contentScale = ContentScale.Crop,
-                                    placeholder = androidx.compose.ui.res.painterResource(com.apple.android.music.R.drawable.ic_default_album_art),
-                                    error = androidx.compose.ui.res.painterResource(com.apple.android.music.R.drawable.ic_default_album_art),
                                     fallback = androidx.compose.ui.res.painterResource(com.apple.android.music.R.drawable.ic_default_album_art),
+                                    contentScale = ContentScale.Fit,
                                     modifier = Modifier.fillMaxSize()
                                 )
                             }

@@ -27,8 +27,8 @@ class CoilBitmapLoader(private val context: Context) : BitmapLoader {
 
         scope.launch {
             try {
-                // Use Coil to load and downsample
-                val result = ImageLoader(context).execute(
+                // Use singleton ImageLoader which has the AudioArtworkFetcher registered
+                val result = coil.Coil.imageLoader(context).execute(
                     ImageRequest.Builder(context)
                         .data(uri)
                         .allowHardware(false) // Important for remote views/notifications

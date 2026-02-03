@@ -95,7 +95,7 @@ fun AlbumGridItem(
                     .crossfade(true)
                     .build(),
                 contentDescription = "Album Art",
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize()
             )
         }

@@ -142,7 +142,7 @@ fun NowPlayingScreen(
                         .crossfade(true)
                         .build(),
                     contentDescription = "Artwork",
-                    contentScale = ContentScale.Crop,
+                    contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize()
                 )
             }
