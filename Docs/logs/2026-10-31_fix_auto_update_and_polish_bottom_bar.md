@@ -1,9 +1,9 @@
 # 📋 Nhật Ký Thực Thi: Sửa lỗi Auto-Update từ phiên bản thấp và nâng cấp UI/UX thanh menu Ký ức
 
-- **Ngày thực hiện**: 2026-10-31 16:55:00
+- **Ngày thực hiện**: 2026-10-31 17:03:00
 - **Agent phụ trách**: `lead-architect`, `qa-perf-specialist`, `compose-ui-specialist`, `storage-data-specialist`
 - **Yêu cầu gốc**: Sửa lỗi auto update khi cài từ version thấp (v1.0.1) lên bản mới nhất. Xem lại UI/UX thanh menu (đang bị lạc tông so với app), đổi "Timeline 24h" thành "Ký ức".
-- **Trạng thái**: 🔄 Đang hoàn tất chuẩn bị phát hành bản sửa lỗi
+- **Trạng thái**: ✅ Hoàn thành
 
 ---
 
@@ -46,7 +46,7 @@
   - Đổi icon sang `AutoAwesome`.
   - Giảm chiều cao xuống `52.dp`, bổ sung hairline divider phía trên.
 - **Bước 6**: Cập nhật tiêu đề màn hình `TimelineScreen.kt` thành **"Ký ức"**.
-- **Bước 7**: Kiểm tra đóng gói release cục bộ bằng `assembleRelease` và xác minh chứng chỉ SHA-256 qua `apksigner`.
+- **Bước 7**: Phát hành bản vá `v1.2.1` (Build 6) lên GitHub Releases và xác minh tệp `app-release.apk` có chữ ký `E1:8C:40:8C...`.
 
 ---
 
@@ -61,7 +61,12 @@
 ---
 
 ## 4. Kiểm Thử & Xác Minh (Verification & Testing)
-- Kiểm tra chữ ký bằng `apksigner`:
-  - `Signer #1 certificate SHA-256 digest: e18c408c52c5664f3a67e8f671f63ebfcbfe0c414bad8e49ffaa2dd250082ee2`
-  - Khớp 100% với phiên bản `v1.0.0` và `v1.0.1`.
-- Kiểm tra build Gradle `assembleRelease`: BUILD SUCCESSFUL.
+- Kiểm tra chữ ký file APK tải về từ GitHub Releases `v1.2.1` bằng `apksigner`:
+  ```text
+  Verifies
+  Verified using v2 scheme (APK Signature Scheme v2): true
+  Signer #1 certificate DN: C=US, O=Android, CN=Android Debug
+  Signer #1 certificate SHA-256 digest: e18c408c52c5664f3a67e8f671f63ebfcbfe0c414bad8e49ffaa2dd250082ee2
+  ```
+  => **Khớp 100% với phiên bản `v1.0.0` và `v1.0.1`** trên máy người dùng.
+- Kiểm tra trực quan thanh menu: Chiều cao `52.dp`, hairline divider mỏng `0.5.dp`, icon lấp lánh `AutoAwesome` và nhãn "Ký ức" hài hòa hoàn hảo với phong cách Apple Music.

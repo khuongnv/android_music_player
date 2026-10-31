@@ -8,7 +8,7 @@ Thư mục này lưu trữ toàn bộ nhật ký chi tiết về các bước th
 
 | Ngày | Tên Tệp Log | Nhiệm Vụ / Tính Năng | Agent Phụ Trách | Trạng Thái |
 | :--- | :--- | :--- | :--- | :--- |
-| 2026-10-31 | [`2026-10-31_fix_auto_update_and_polish_bottom_bar.md`](./2026-10-31_fix_auto_update_and_polish_bottom_bar.md) | Sửa lỗi Auto-Update từ phiên bản thấp và nâng cấp UI/UX thanh menu Ký ức | `lead-architect` | 🔄 Đang tiến hành |
+| 2026-10-31 | [`2026-10-31_fix_auto_update_and_polish_bottom_bar.md`](./2026-10-31_fix_auto_update_and_polish_bottom_bar.md) | Sửa lỗi Auto-Update từ phiên bản thấp và nâng cấp UI/UX thanh menu Ký ức | `lead-architect` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_release_v1.2.0.md`](./2026-10-31_release_v1.2.0.md) | Phát hành phiên bản v1.2.0 (Tính năng tùy chọn Giao diện Sáng Tối & Tối ưu điều hướng) | `lead-architect` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_fix_timeline_nav_and_theme_customization.md`](./2026-10-31_fix_timeline_nav_and_theme_customization.md) | Sửa điều hướng Timeline và hoàn thiện cài đặt Dark Light Theme | `lead-architect` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_fix_invalid_package_auto_update.md`](./2026-10-31_fix_invalid_package_auto_update.md) | Khac phuc loi update goi khong hop le do thieu chu ky APK | `qa-perf-specialist` | ✅ Hoàn thành |
