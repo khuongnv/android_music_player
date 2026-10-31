@@ -8,6 +8,7 @@ Thư mục này lưu trữ toàn bộ nhật ký chi tiết về các bước th
 
 | Ngày | Tên Tệp Log | Nhiệm Vụ / Tính Năng | Agent Phụ Trách | Trạng Thái |
 | :--- | :--- | :--- | :--- | :--- |
+| 2026-10-31 | [`2026-10-31_release_v1.0.0.md`](./2026-10-31_release_v1.0.0.md) | Phát hành phiên bản nền tảng v1.0.0 | `lead-architect` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_create_deploy_app_skill.md`](./2026-10-31_create_deploy_app_skill.md) | Tạo Skill deploy-app tự động phát hành phiên bản mới | `lead-architect` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_implement_auto_update_feature.md`](./2026-10-31_implement_auto_update_feature.md) | Xây dựng tính năng Auto-Update qua GitHub Releases | `lead-architect` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_create_apple_music_ui_ux_rules.md`](./2026-10-31_create_apple_music_ui_ux_rules.md) | Quy chuẩn hóa UI/UX theo phong cách Apple Music | `compose-ui-specialist` | ✅ Hoàn thành |
