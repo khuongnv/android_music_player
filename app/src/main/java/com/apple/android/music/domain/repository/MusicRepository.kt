@@ -26,8 +26,11 @@ interface MusicRepository {
     suspend fun getAllArtists(): List<Artist>
     fun getArtistsFlow(): Flow<List<Artist>>
     
-    // Refresh data from MediaStore
+    // Refresh data from MediaStore or custom folders
     suspend fun refreshMusic()
+
+    // Clear local Room database
+    suspend fun clearMusicDatabase()
 
     // Folders
     suspend fun getMusicFolders(): List<String>

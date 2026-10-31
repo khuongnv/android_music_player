@@ -1,6 +1,10 @@
 package com.apple.android.music.ui.screens.settings
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.media.audiofx.AudioEffect
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apple.android.music.data.local.updater.ApkInstaller
@@ -10,14 +14,20 @@ import com.apple.android.music.domain.repository.SettingsRepository
 import com.apple.android.music.domain.usecase.CheckAppUpdateUseCase
 import com.apple.android.music.domain.usecase.DownloadAppUpdateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,28 +45,43 @@ class SettingsViewModel @Inject constructor(
     )
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
+    private var timerTickerJob: Job? = null
+
     init {
         loadFolders()
-        observeSleepTimerSettings()
-        // Check if an APK was already downloaded in previous session
+        observeSleepTimer()
+        loadCacheSize()
+        checkCachedApk()
+    }
+
+    private fun checkCachedApk() {
         val cachedApk = downloadAppUpdateUseCase.getDownloadedApkFile()
         if (cachedApk != null) {
             _uiState.update { it.copy(updateStatus = UpdateStatus.ReadyToInstall(cachedApk)) }
         }
     }
 
-    private fun observeSleepTimerSettings() {
+    // --- Sleep Timer ---
+
+    private fun observeSleepTimer() {
         viewModelScope.launch {
             combine(
                 settingsRepository.sleepTimerEnabled,
-                settingsRepository.sleepTimerDuration
-            ) { enabled, duration ->
-                Triple(enabled, duration, System.currentTimeMillis())
-            }.collect { (enabled, duration, currentTime) ->
-                val endTimeString = if (enabled && duration > 0) {
-                    val endTimeMillis = currentTime + (duration * 60 * 1000L)
-                    val formatter = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-                    formatter.format(java.util.Date(endTimeMillis))
+                settingsRepository.sleepTimerDuration,
+                settingsRepository.sleepTimerTargetTime
+            ) { enabled, duration, targetTime ->
+                Triple(enabled, duration, targetTime)
+            }.collect { (enabled, duration, targetTime) ->
+                val now = System.currentTimeMillis()
+                val remainingSeconds = if (enabled && targetTime > now) {
+                    (targetTime - now) / 1000L
+                } else {
+                    0L
+                }
+
+                val endTimeString = if (enabled && targetTime > now) {
+                    val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+                    formatter.format(Date(targetTime))
                 } else {
                     null
                 }
@@ -64,21 +89,81 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         sleepTimerEnabled = enabled,
-                        sleepTimerDuration = duration.toString(),
-                        sleepTimerEndTime = endTimeString
+                        sleepTimerDurationMinutes = duration,
+                        sleepTimerTargetTime = targetTime,
+                        sleepTimerRemainingSeconds = remainingSeconds,
+                        sleepTimerEndTimeString = endTimeString
                     )
+                }
+
+                if (enabled && targetTime > now) {
+                    startTimerTicker(targetTime)
+                } else {
+                    timerTickerJob?.cancel()
                 }
             }
         }
     }
 
+    private fun startTimerTicker(targetTime: Long) {
+        timerTickerJob?.cancel()
+        timerTickerJob = viewModelScope.launch {
+            while (isActive) {
+                val now = System.currentTimeMillis()
+                val diffSeconds = (targetTime - now) / 1000L
+                if (diffSeconds <= 0L) {
+                    _uiState.update {
+                        it.copy(
+                            sleepTimerEnabled = false,
+                            sleepTimerRemainingSeconds = 0L,
+                            sleepTimerEndTimeString = null
+                        )
+                    }
+                    break
+                }
+                _uiState.update { it.copy(sleepTimerRemainingSeconds = diffSeconds) }
+                delay(1000L)
+            }
+        }
+    }
+
+    fun setSleepTimerPreset(minutes: Int) {
+        viewModelScope.launch {
+            if (minutes > 0) {
+                settingsRepository.setSleepTimer(minutes)
+                _uiState.update {
+                    it.copy(toastMessage = "Đã hẹn giờ tắt nhạc sau $minutes phút.")
+                }
+            } else {
+                cancelSleepTimer()
+            }
+        }
+    }
+
+    fun cancelSleepTimer() {
+        viewModelScope.launch {
+            settingsRepository.cancelSleepTimer()
+            _uiState.update {
+                it.copy(
+                    sleepTimerEnabled = false,
+                    sleepTimerRemainingSeconds = 0L,
+                    sleepTimerEndTimeString = null,
+                    toastMessage = "Đã tắt hẹn giờ nghe nhạc."
+                )
+            }
+        }
+    }
+
+    // --- Folders & Library ---
+
     fun loadFolders() {
         viewModelScope.launch {
             settingsRepository.selectedFolders.collect { selected ->
-                val foldersInfo = selected.map { path ->
+                val foldersInfo = selected.map { uriString ->
                     FolderInfo(
-                        path = path,
-                        name = try { File(path).name.ifEmpty { path } } catch (e: Exception) { path },
+                        uriString = uriString,
+                        name = formatFolderDisplayName(uriString),
+                        path = uriString,
                         isSelected = true
                     )
                 }
@@ -87,54 +172,107 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun setSleepTimerEnabled(enabled: Boolean) {
-        viewModelScope.launch {
-            settingsRepository.setSleepTimerEnabled(enabled)
-        }
-    }
-
-    fun setSleepTimerDuration(durationStr: String) {
-        if (durationStr.all { it.isDigit() }) {
-            _uiState.update { it.copy(sleepTimerDuration = durationStr) }
-            val duration = durationStr.toIntOrNull()
-            if (duration != null && duration > 0) {
-                viewModelScope.launch {
-                    settingsRepository.setSleepTimerDuration(duration)
-                }
-            }
-        }
-    }
-
-    fun addFolder(uri: android.net.Uri) {
+    fun addFolder(uri: Uri) {
         viewModelScope.launch {
             val currentSelected = settingsRepository.getSelectedFolders().toMutableSet()
             currentSelected.add(uri.toString())
             settingsRepository.setSelectedFolders(currentSelected)
+            _uiState.update {
+                it.copy(toastMessage = "Đã thêm thư mục quét nhạc.")
+            }
             refreshLibrary()
         }
     }
 
-    fun removeFolder(path: String) {
+    fun removeFolder(uriString: String) {
         viewModelScope.launch {
             val currentSelected = settingsRepository.getSelectedFolders().toMutableSet()
-            currentSelected.remove(path)
+            currentSelected.remove(uriString)
             settingsRepository.setSelectedFolders(currentSelected)
+            _uiState.update {
+                it.copy(toastMessage = "Đã xóa thư mục.")
+            }
             refreshLibrary()
         }
     }
 
     fun refreshLibrary() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            musicRepository.refreshMusic()
-            _uiState.update { it.copy(isLoading = false) }
+            _uiState.update { it.copy(isScanning = true) }
+            try {
+                musicRepository.refreshMusic()
+                _uiState.update {
+                    it.copy(
+                        isScanning = false,
+                        toastMessage = "Đã làm mới thư viện nhạc thành công."
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isScanning = false,
+                        toastMessage = "Lỗi khi quét thư viện: ${e.message}"
+                    )
+                }
+            }
         }
+    }
+
+    // --- Cache & Storage ---
+
+    fun loadCacheSize() {
+        viewModelScope.launch {
+            val bytes = settingsRepository.getCacheSizeBytes()
+            _uiState.update {
+                it.copy(
+                    cacheSizeBytes = bytes,
+                    cacheSizeFormatted = formatFileSize(bytes)
+                )
+            }
+        }
+    }
+
+    fun showClearCacheConfirmation(show: Boolean) {
+        _uiState.update { it.copy(showClearCacheConfirm = show) }
     }
 
     fun clearCache() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            _uiState.update { it.copy(isLoading = false) }
+            _uiState.update {
+                it.copy(
+                    isClearingCache = true,
+                    showClearCacheConfirm = false
+                )
+            }
+            val success = settingsRepository.clearCache()
+            loadCacheSize()
+            _uiState.update {
+                it.copy(
+                    isClearingCache = false,
+                    toastMessage = if (success) "Đã xóa bộ nhớ đệm thành công." else "Không thể xóa hoàn toàn bộ nhớ đệm."
+                )
+            }
+        }
+    }
+
+    // --- Audio & Equalizer ---
+
+    fun openEqualizer(context: Context) {
+        try {
+            val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL).apply {
+                putExtra(AudioEffect.EXTRA_PACKAGE_NAME, context.packageName)
+                putExtra(AudioEffect.EXTRA_AUDIO_SESSION, 0)
+                putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
+            }
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            _uiState.update {
+                it.copy(toastMessage = "Thiết bị không có ứng dụng Bộ cân bằng âm thanh (Equalizer) tương thích.")
+            }
+        } catch (e: Exception) {
+            _uiState.update {
+                it.copy(toastMessage = "Không thể mở bộ chỉnh âm: ${e.message}")
+            }
         }
     }
 
@@ -236,5 +374,40 @@ class SettingsViewModel @Inject constructor(
 
     fun dismissUpdateDialog() {
         _uiState.update { it.copy(showUpdateDialog = false) }
+    }
+
+    fun clearToastMessage() {
+        _uiState.update { it.copy(toastMessage = null) }
+    }
+
+    // --- Helpers ---
+
+    private fun formatFileSize(bytes: Long): String {
+        if (bytes <= 0L) return "0 MB"
+        val kb = bytes / 1024.0
+        val mb = kb / 1024.0
+        val gb = mb / 1024.0
+        return when {
+            gb >= 1.0 -> String.format(Locale.US, "%.2f GB", gb)
+            mb >= 0.1 -> String.format(Locale.US, "%.1f MB", mb)
+            else -> String.format(Locale.US, "%.0f KB", kb)
+        }
+    }
+
+    private fun formatFolderDisplayName(uriString: String): String {
+        return try {
+            val uri = Uri.parse(uriString)
+            val decoded = Uri.decode(uri.lastPathSegment ?: uriString)
+            when {
+                decoded.contains(":") -> {
+                    val parts = decoded.split(":")
+                    val folder = parts.getOrNull(1)?.ifEmpty { "Bộ nhớ trong" } ?: "Bộ nhớ trong"
+                    if (folder == "Bộ nhớ trong") "Thư mục gốc thiết bị" else "📁 $folder"
+                }
+                else -> "📁 $decoded"
+            }
+        } catch (e: Exception) {
+            uriString
+        }
     }
 }

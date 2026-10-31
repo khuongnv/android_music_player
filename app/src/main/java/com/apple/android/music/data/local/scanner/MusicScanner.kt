@@ -1,8 +1,10 @@
 package com.apple.android.music.data.local.scanner
 
+import android.content.ContentUris
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.apple.android.music.data.local.room.dao.AlbumDao
@@ -11,12 +13,10 @@ import com.apple.android.music.data.local.room.dao.SongDao
 import com.apple.android.music.data.local.room.entity.AlbumEntity
 import com.apple.android.music.data.local.room.entity.ArtistEntity
 import com.apple.android.music.data.local.room.entity.SongEntity
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 import javax.inject.Inject
-
-import dagger.hilt.android.qualifiers.ApplicationContext
 
 class MusicScanner @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -64,25 +64,17 @@ class MusicScanner @Inject constructor(
             val year = yearStr?.toIntOrNull()
 
             // Handle Artist
-            var artist = artistDao.getArtistByName(artistName)
-            val artistId: Long
-            if (artist == null) {
-                artistId = artistDao.insertArtist(ArtistEntity(name = artistName))
-                // Reload to capture ID if needed, or use return value
-                // insertArtist returns Long ID
+            val artist = artistDao.getArtistByName(artistName)
+            val artistId: Long = if (artist == null) {
+                artistDao.insertArtist(ArtistEntity(name = artistName))
             } else {
-                artistId = artist.id
+                artist.id
             }
 
             // Handle Album
-            var album = albumDao.getAlbumByNameAndArtist(albumName, artistName)
-            val albumId: Long
-            if (album == null) {
-                // Try to get embedded picture
-                // Note: Reading embedded picture is heavy. We might want to store URI to file and load with Coil using audio URI.
-                // Or save to internal storage.
-                // For now, let's just use the file URI as artwork source for Coil (it supports audio file artwork).
-                albumId = albumDao.insertAlbum(
+            val album = albumDao.getAlbumByNameAndArtist(albumName, artistName)
+            val albumId: Long = if (album == null) {
+                albumDao.insertAlbum(
                     AlbumEntity(
                         title = albumName, 
                         artist = artistName,
@@ -91,7 +83,7 @@ class MusicScanner @Inject constructor(
                     )
                 )
             } else {
-                albumId = album.id
+                album.id
             }
 
             // Insert Song
@@ -119,12 +111,107 @@ class MusicScanner @Inject constructor(
             }
         }
     }
+
+    suspend fun scanMediaStore() = withContext(Dispatchers.IO) {
+        val projection = arrayOf(
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.ALBUM_ID,
+            MediaStore.Audio.Media.SIZE,
+            MediaStore.Audio.Media.DATE_ADDED
+        )
+        val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
+        val sortOrder = "${MediaStore.Audio.Media.TITLE} ASC"
+
+        try {
+            context.contentResolver.query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                null,
+                sortOrder
+            )?.use { cursor ->
+                val idCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+                val titleCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+                val artistCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+                val albumCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+                val durCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                val albumIdCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+                val sizeCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
+                val dateCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
+
+                while (cursor.moveToNext()) {
+                    val id = cursor.getLong(idCol)
+                    val uri = ContentUris.withAppendedId(
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        id
+                    )
+                    val uriString = uri.toString()
+                    val existing = songDao.getSongByPath(uriString)
+                    if (existing != null) continue
+
+                    val duration = cursor.getLong(durCol)
+                    if (duration <= 0) continue
+
+                    val title = cursor.getString(titleCol) ?: "Unknown Title"
+                    val artistName = cursor.getString(artistCol) ?: "Unknown Artist"
+                    val albumName = cursor.getString(albumCol) ?: "Unknown Album"
+                    val mediaStoreAlbumId = cursor.getLong(albumIdCol)
+                    val size = cursor.getLong(sizeCol)
+                    val dateAdded = cursor.getLong(dateCol)
+
+                    val albumArtUri = ContentUris.withAppendedId(
+                        Uri.parse("content://media/external/audio/albumart"),
+                        mediaStoreAlbumId
+                    ).toString()
+
+                    val artist = artistDao.getArtistByName(artistName)
+                    val artistId = if (artist == null) {
+                        artistDao.insertArtist(ArtistEntity(name = artistName))
+                    } else {
+                        artist.id
+                    }
+
+                    val album = albumDao.getAlbumByNameAndArtist(albumName, artistName)
+                    val albumId = if (album == null) {
+                        albumDao.insertAlbum(
+                            AlbumEntity(
+                                title = albumName,
+                                artist = artistName,
+                                year = null,
+                                artworkPath = albumArtUri
+                            )
+                        )
+                    } else {
+                        album.id
+                    }
+
+                    val song = SongEntity(
+                        title = title,
+                        artist = artistName,
+                        album = albumName,
+                        path = uriString,
+                        duration = duration,
+                        size = size,
+                        dateAdded = dateAdded,
+                        artistId = artistId,
+                        albumId = albumId,
+                        artworkUri = albumArtUri
+                    )
+                    songDao.insertSong(song)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MusicScanner", "Error scanning MediaStore", e)
+        }
+    }
     
     suspend fun clearDatabase() = withContext(Dispatchers.IO) {
         songDao.clearAll()
         albumDao.clearAll()
         artistDao.clearAll()
-        // Playlists? Maybe keep them but clean up invalid songs? 
-        // For now, full clear as requested "Clear Library Cache".
     }
 }

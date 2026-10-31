@@ -12,4 +12,11 @@ interface SettingsRepository {
 
     val sleepTimerDuration: Flow<Int>
     suspend fun setSleepTimerDuration(minutes: Int)
+
+    val sleepTimerTargetTime: Flow<Long>
+    suspend fun setSleepTimer(durationMinutes: Int)
+    suspend fun cancelSleepTimer()
+
+    suspend fun getCacheSizeBytes(): Long
+    suspend fun clearCache(): Boolean
 }

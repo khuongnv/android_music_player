@@ -43,8 +43,6 @@ class MusicRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSongsForArtist(artistName: String): List<Song> {
-        // We need artistId. But the interface takes artistName.
-        // We can look up Artist by name first.
         val artist = artistDao.getArtistByName(artistName) ?: return emptyList()
         return songDao.getSongsByArtist(artist.id).first().map { it.toDomain() }
     }
@@ -62,11 +60,6 @@ class MusicRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAllArtists(): List<Artist> {
-        // We need to calculate songCount if not stored. ArtistEntity has numberOfTracks.
-        // Assuming MusicScanner updates it or we calculate it here?
-        // Scanner didn't explicitly update artist counts.
-        // Ideally we query DB for count.
-        // For now, mapping directly.
         return artistDao.getAllArtists().first().map { it.toDomain() }
     }
 
@@ -76,20 +69,27 @@ class MusicRepositoryImpl @Inject constructor(
 
     override suspend fun refreshMusic() {
         val folders = settingsRepository.getSelectedFolders()
-        // If folders is a list of strings (URI strings)
         Log.d("MusicRepository", "Scanning folders: $folders")
-        folders.forEach { uriString ->
-             try {
-                 val uri = Uri.parse(uriString)
-                 musicScanner.scanDirectory(uri)
-             } catch (e: Exception) {
-                 Log.e("MusicRepository", "Error parsing URI: $uriString", e)
-             }
+        if (folders.isNotEmpty()) {
+            folders.forEach { uriString ->
+                try {
+                    val uri = Uri.parse(uriString)
+                    musicScanner.scanDirectory(uri)
+                } catch (e: Exception) {
+                    Log.e("MusicRepository", "Error parsing URI: $uriString", e)
+                }
+            }
+        } else {
+            // Default: Scan device audio library via MediaStore
+            musicScanner.scanMediaStore()
         }
     }
 
+    override suspend fun clearMusicDatabase() {
+        musicScanner.clearDatabase()
+    }
+
     override suspend fun getMusicFolders(): List<String> {
-        // Return folders from Settings 
         return settingsRepository.getSelectedFolders().toList()
     }
 
@@ -112,7 +112,7 @@ class MusicRepositoryImpl @Inject constructor(
             id = id,
             name = title,
             artist = artist,
-            songCount = 0, // TODO: Implement count query
+            songCount = 0,
             albumArtUri = artworkPath?.let { Uri.parse(it) }
         )
     }

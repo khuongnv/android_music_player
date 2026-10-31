@@ -8,6 +8,7 @@ Thư mục này lưu trữ toàn bộ nhật ký chi tiết về các bước th
 
 | Ngày | Tên Tệp Log | Nhiệm Vụ / Tính Năng | Agent Phụ Trách | Trạng Thái |
 | :--- | :--- | :--- | :--- | :--- |
+| 2026-10-31 | [`2026-10-31_refactor_and_polish_settings_screen.md`](./2026-10-31_refactor_and_polish_settings_screen.md) | Hoàn Thiện Tính Năng & Chuẩn Hóa UI UX Settings Apple Music | `lead-architect` | 🔄 Đang tiến hành |
 | 2026-10-31 | [`2026-10-31_release_v1.0.1.md`](./2026-10-31_release_v1.0.1.md) | Phát hành bản vá v1.0.1 | `lead-architect` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_verify_public_auto_update.md`](./2026-10-31_verify_public_auto_update.md) | Xác minh tính năng Auto-Update trên Repository Public | `qa-perf-specialist` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_analysis_release_apk_and_auto_update.md`](./2026-10-31_analysis_release_apk_and_auto_update.md) | Phân tích cơ chế đẩy APK GitHub Releases & Điều kiện Auto-Update | `lead-architect`, `qa-perf-specialist` | ✅ Hoàn thành |

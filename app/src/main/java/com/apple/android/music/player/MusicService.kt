@@ -89,28 +89,35 @@ class MusicService : MediaSessionService() {
 
     private fun observeSleepTimer() {
         serviceScope.launch {
-            // Combine enabled and duration to react to changes
             kotlinx.coroutines.flow.combine(
                 settingsRepository.sleepTimerEnabled,
-                settingsRepository.sleepTimerDuration
-            ) { enabled, duration ->
-                Pair(enabled, duration)
-            }.collect { (enabled, duration) ->
-                manageSleepTimer(enabled, duration)
+                settingsRepository.sleepTimerTargetTime
+            ) { enabled, targetTime ->
+                Pair(enabled, targetTime)
+            }.collect { (enabled, targetTime) ->
+                manageSleepTimer(enabled, targetTime)
             }
         }
     }
 
-    private fun manageSleepTimer(enabled: Boolean, durationMinutes: Int) {
+    private fun manageSleepTimer(enabled: Boolean, targetTimeMillis: Long) {
         sleepTimerJob?.cancel()
-        if (enabled && durationMinutes > 0) {
-            Log.d("MusicApp", "MusicService: Sleep timer started for $durationMinutes minutes")
-            sleepTimerJob = serviceScope.launch {
-                delay(durationMinutes * 60 * 1000L)
-                Log.d("MusicApp", "MusicService: Sleep timer expired. Pausing playback.")
+        if (enabled && targetTimeMillis > 0L) {
+            val remainingDelay = targetTimeMillis - System.currentTimeMillis()
+            Log.d("MusicApp", "MusicService: Sleep timer active. Target: $targetTimeMillis, Remaining: ${remainingDelay / 1000}s")
+            if (remainingDelay <= 0L) {
+                Log.d("MusicApp", "MusicService: Sleep timer already reached. Pausing playback.")
                 player?.pause()
-                // Disable timer after it fires
-                settingsRepository.setSleepTimerEnabled(false)
+                serviceScope.launch {
+                    settingsRepository.cancelSleepTimer()
+                }
+            } else {
+                sleepTimerJob = serviceScope.launch {
+                    delay(remainingDelay)
+                    Log.d("MusicApp", "MusicService: Sleep timer expired. Pausing playback.")
+                    player?.pause()
+                    settingsRepository.cancelSleepTimer()
+                }
             }
         } else {
             Log.d("MusicApp", "MusicService: Sleep timer disabled")
