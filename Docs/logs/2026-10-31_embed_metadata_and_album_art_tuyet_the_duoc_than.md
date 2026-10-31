@@ -26,19 +26,20 @@
 
 ## 2. Chi Tiết Các Bước Thực Hiện (Execution Steps)
 
-- **Bước 1: Chuẩn bị ảnh bìa (Album Art)**:
-  - Tải thumbnail gốc từ YouTube bằng `yt-dlp`.
-  - Dùng `ffmpeg` crop căn giữa tỉ lệ 1:1 và scale thành 600x600 px lưu thành `cover.jpg`.
+- **Bước 1: Chuẩn bị & nâng cấp ảnh bìa Tiên Hiệp (Xianxia Album Art)**:
+  - Khởi tạo ảnh bìa nghệ thuật phong cách Tiên hiệp / Tu tiên huyền ảo cho "Tuyệt Thế Dược Thần": Nhân vật luyện đan sư / Dược Thần (Diệp Viên) đạo bào phiêu dật, đỉnh luyện đan cổ đồng lơ lửng giữa mây núi tiên cảnh, đan hỏa rồng thiêng và đan dược phát quang huyền ảo.
+  - Tối ưu hóa ảnh bìa về độ phân giải chuẩn 800x800 px (tỉ lệ 1:1), dung lượng nhẹ ~148 KB giúp tối ưu hóa tốc độ giải mã Bitmap của Coil trên Android mà vẫn đảm bảo độ sắc nét cao trên màn hình OLED/Retina.
 - **Bước 2: Xây dựng kịch bản nhúng thẻ ID3v2 & APIC Image**:
   - Biên soạn kịch bản Node.js với ánh xạ 19 tập (102 -> 120).
   - Cấu hình cờ FFmpeg `-c:a copy` (copy bitstream âm thanh trực tiếp, không re-encode gây giảm chất lượng hay tốn thời gian, tốc độ ~5200x) kết hợp `-map 0:a -map 1:v -c:v copy -id3v2_version 3`.
-- **Bước 3: Nhúng metadata hàng loạt**:
-  - Thực thi tuần tự trên 19 tập (~1.9 GB tổng dung lượng).
-  - Hoàn tất trong vòng 15 giây.
-- **Bước 4: Tạo tệp Playlist M3U**:
+- **Bước 3: Nhúng metadata & ảnh bìa hàng loạt**:
+  - Thực thi tuần tự trên toàn bộ 19 tập.
+  - Cập nhật ảnh bìa mới cho `Tập 102.mp3` đến `Tập 120.mp3`.
+- **Bước 4: Tạo tệp Playlist M3U & Cover thư mục**:
+  - Đặt `Tuyệt thế dược thần/cover.jpg` (800x800 px) phục vụ MediaStore và File Manager.
   - Tạo tệp `Tuyệt thế dược thần/Tuyệt thế dược thần.m3u` ghi danh sách 19 tập với thông tin `#EXTINF`.
 - **Bước 5: Dọn dẹp**:
-  - Xóa bỏ các tệp tạm ở thư mục gốc (`cover.webp`, `cover.jpg` tạm, script xử lý tạm).
+  - Xóa bỏ các tệp tạm, giữ working tree sạch sẽ.
 
 ---
 
