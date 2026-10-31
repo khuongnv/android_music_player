@@ -53,7 +53,7 @@ fun LibraryScreen(
     viewModel: LibraryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val isDark = MaterialTheme.colorScheme.background == DarkBackground
+    val isDark = com.apple.android.music.ui.theme.LocalIsDarkTheme.current
 
     // Liquid Glass color tokens
     val glassBg = if (isDark) {

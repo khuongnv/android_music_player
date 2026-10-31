@@ -84,7 +84,7 @@ fun BottomNavBar(
     onNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isDark = MaterialTheme.colorScheme.background == DarkBackground
+    val isDark = com.apple.android.music.ui.theme.LocalIsDarkTheme.current
 
     // Liquid Glass color tokens
     val glassBg = if (isDark) {

@@ -39,7 +39,7 @@ fun ArtistsScreen(
     viewModel: ArtistsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.artistsState.collectAsState()
-    val isDark = MaterialTheme.colorScheme.background == DarkBackground
+    val isDark = com.apple.android.music.ui.theme.LocalIsDarkTheme.current
 
     val glassBg = if (isDark) Color(0xEE1E1E22) else Color(0xF2FFFFFF)
     val glassBorder = if (isDark) Color(0x33FFFFFF) else Color(0x1F000000)

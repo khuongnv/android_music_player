@@ -35,7 +35,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.apple.android.music.R
 import com.apple.android.music.ui.theme.AppleRed
-import com.apple.android.music.ui.theme.MusicPlayerTheme
 import com.apple.android.music.util.TimeUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,12 +51,11 @@ fun NowPlayingScreen(
     // For slider smoothness
     var sliderPosition by remember { mutableStateOf<Float?>(null) }
 
-    MusicPlayerTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background) 
-        ) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background) 
+    ) {
         // Blurred Background Overlay
         currentSong?.let { song ->
             AsyncImage(
@@ -69,7 +67,7 @@ fun NowPlayingScreen(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer(alpha = 0.7f) // Increased vibrancy
+                    .graphicsLayer(alpha = 0.7f)
                     .blur(70.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
             )
             
@@ -91,7 +89,7 @@ fun NowPlayingScreen(
             // Check currentSong validity
             if (currentSong == null) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No music playing")
+                    Text("Không có bài hát đang phát", color = MaterialTheme.colorScheme.onBackground)
                 }
                 return@Column
             }
@@ -109,7 +107,7 @@ fun NowPlayingScreen(
                  ) {
                      Icon(
                          imageVector = Icons.Default.KeyboardArrowDown, 
-                         contentDescription = "Collapse", 
+                         contentDescription = "Thu nhỏ", 
                          modifier = Modifier.size(32.dp),
                          tint = MaterialTheme.colorScheme.onSurface
                      )
@@ -120,7 +118,7 @@ fun NowPlayingScreen(
                          .width(40.dp)
                          .height(5.dp)
                          .clip(RoundedCornerShape(50))
-                         .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
+                         .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f))
                  )
             }
 
@@ -141,7 +139,7 @@ fun NowPlayingScreen(
                         .data(currentSong!!.albumArtUri ?: R.drawable.ic_default_album_art)
                         .crossfade(true)
                         .build(),
-                    contentDescription = "Artwork",
+                    contentDescription = "Ảnh bìa",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -178,7 +176,12 @@ fun NowPlayingScreen(
                 }
                 
                 IconButton(onClick = { /* More Options */ }) {
-                    Icon(Icons.Default.MoreHoriz, contentDescription = "More", modifier = Modifier.size(28.dp), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                    Icon(
+                        Icons.Default.MoreHoriz,
+                        contentDescription = "Tùy chọn khác",
+                        modifier = Modifier.size(28.dp),
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
                 }
             }
 
@@ -223,13 +226,22 @@ fun NowPlayingScreen(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Shuffle (Optional implementation)
                 IconButton(onClick = { viewModel.toggleShuffle() }) {
-                     Icon(Icons.Default.Shuffle, contentDescription = "Shuffle", tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), modifier = Modifier.size(22.dp))
+                     Icon(
+                         Icons.Default.Shuffle,
+                         contentDescription = "Trộn bài",
+                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                         modifier = Modifier.size(22.dp)
+                     )
                 }
                 
                 IconButton(onClick = { viewModel.skipPrevious() }) {
-                    Icon(Icons.Default.SkipPrevious, contentDescription = "Previous", modifier = Modifier.size(42.dp), tint = MaterialTheme.colorScheme.onSurface)
+                    Icon(
+                        Icons.Default.SkipPrevious,
+                        contentDescription = "Bài trước",
+                        modifier = Modifier.size(42.dp),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
                 }
                 
                 // Play/Pause - Big
@@ -243,29 +255,33 @@ fun NowPlayingScreen(
                 ) {
                    Icon(
                        imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                       contentDescription = "Play/Pause",
+                       contentDescription = "Phát/Tạm dừng",
                        modifier = Modifier.size(36.dp),
-                       tint = MaterialTheme.colorScheme.background // Inverted color
+                       tint = MaterialTheme.colorScheme.background
                    )
                 }
                 
                 IconButton(onClick = { viewModel.skipNext() }) {
-                    Icon(Icons.Default.SkipNext, contentDescription = "Next", modifier = Modifier.size(42.dp), tint = MaterialTheme.colorScheme.onSurface)
+                    Icon(
+                        Icons.Default.SkipNext,
+                        contentDescription = "Bài tiếp theo",
+                        modifier = Modifier.size(42.dp),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
                 }
                 
-                // Repeat (Optional implementation)
                 IconButton(onClick = { viewModel.toggleRepeat() }) {
-                     Icon(Icons.Default.Repeat, contentDescription = "Repeat", tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), modifier = Modifier.size(22.dp))
+                     Icon(
+                         Icons.Default.Repeat,
+                         contentDescription = "Lặp lại",
+                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                         modifier = Modifier.size(22.dp)
+                     )
                 }
             }
 
             Spacer(modifier = Modifier.weight(0.2f))
-            
-            // Volume Slider (Visual only for now, Apple Music has it)
-            // Icon(Icons.AutoMirrored.Filled.VolumeDown) -- Slider -- Icon(Icons.AutoMirrored.Filled.VolumeUp)
-            
             Spacer(modifier = Modifier.height(40.dp))
         }
     }
-}
 }

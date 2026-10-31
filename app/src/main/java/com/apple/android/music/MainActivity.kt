@@ -92,7 +92,10 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    Surface(modifier = Modifier.fillMaxSize()) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
                         val navBackStackEntry by navController.currentBackStackEntryAsState()
                         val currentRoute = navBackStackEntry?.destination?.route ?: "home"
                         
@@ -136,6 +139,7 @@ class MainActivity : ComponentActivity() {
 
                         Box(modifier = Modifier.fillMaxSize()) {
                             Scaffold(
+                                containerColor = MaterialTheme.colorScheme.background,
                                 bottomBar = {
                                     Column {
                                         // Global Mini Player
