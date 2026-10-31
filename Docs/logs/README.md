@@ -8,6 +8,7 @@ Thư mục này lưu trữ toàn bộ nhật ký chi tiết về các bước th
 
 | Ngày | Tên Tệp Log | Nhiệm Vụ / Tính Năng | Agent Phụ Trách | Trạng Thái |
 | :--- | :--- | :--- | :--- | :--- |
+| 2026-10-31 | [`2026-10-31_fix_invalid_package_auto_update.md`](./2026-10-31_fix_invalid_package_auto_update.md) | Khac phuc loi update goi khong hop le do thieu chu ky APK | `qa-perf-specialist` | 🔄 Đang tiến hành |
 | 2026-10-31 | [`2026-10-31_release_v1.1.0.md`](./2026-10-31_release_v1.1.0.md) | Phat hanh phien ban v1.1.0 (Minor Release: 24h Activity Timeline & Settings Apple Music) | `lead-architect` | 🔄 Đang tiến hành |
 | 2026-10-31 | [`2026-10-31_implement_24h_playback_timeline.md`](./2026-10-31_implement_24h_playback_timeline.md) | Xay dung tinh nang 24h Activity Timeline tuong tac thoi gian thuc | `lead-architect` | 🔄 Đang tiến hành |
 | 2026-10-31 | [`2026-10-31_refactor_and_polish_settings_screen.md`](./2026-10-31_refactor_and_polish_settings_screen.md) | Hoàn Thiện Tính Năng & Chuẩn Hóa UI UX Settings Apple Music | `lead-architect` | 🔄 Đang tiến hành |

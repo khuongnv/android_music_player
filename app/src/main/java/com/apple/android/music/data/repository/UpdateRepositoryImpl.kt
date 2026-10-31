@@ -85,13 +85,26 @@ class UpdateRepositoryImpl @Inject constructor(
             var assetSize = 0L
 
             if (assetsArray != null) {
+                // Priority 1: Pick a signed APK (does not contain "unsigned")
                 for (i in 0 until assetsArray.length()) {
                     val asset = assetsArray.getJSONObject(i)
                     val assetName = asset.optString("name", "")
-                    if (assetName.endsWith(".apk", ignoreCase = true)) {
+                    if (assetName.endsWith(".apk", ignoreCase = true) && !assetName.contains("unsigned", ignoreCase = true)) {
                         downloadUrl = asset.optString("browser_download_url", "")
                         assetSize = asset.optLong("size", 0L)
                         break
+                    }
+                }
+                // Priority 2: Fallback to any APK only if no signed APK is found
+                if (downloadUrl.isEmpty()) {
+                    for (i in 0 until assetsArray.length()) {
+                        val asset = assetsArray.getJSONObject(i)
+                        val assetName = asset.optString("name", "")
+                        if (assetName.endsWith(".apk", ignoreCase = true)) {
+                            downloadUrl = asset.optString("browser_download_url", "")
+                            assetSize = asset.optLong("size", 0L)
+                            break
+                        }
                     }
                 }
             }

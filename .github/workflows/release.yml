@@ -26,13 +26,20 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Android Release APK
-        run: ./gradlew assembleRelease --stacktrace || ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleRelease --stacktrace
 
       - name: Locate APK
         id: find_apk
         run: |
-          APK_PATH=$(find app/build/outputs/apk/ -name "*.apk" | head -n 1)
-          echo "Found APK at: $APK_PATH"
+          APK_PATH=$(find app/build/outputs/apk/release/ -name "app-release.apk" | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            APK_PATH=$(find app/build/outputs/apk/ -name "*.apk" ! -name "*unsigned*" | head -n 1)
+          fi
+          if [ -z "$APK_PATH" ]; then
+            echo "Error: No signed APK found!"
+            exit 1
+          fi
+          echo "Found signed APK at: $APK_PATH"
           echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release & Upload Asset
