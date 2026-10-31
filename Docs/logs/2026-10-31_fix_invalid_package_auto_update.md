@@ -1,9 +1,9 @@
 # 📋 Nhật Ký Thực Thi: Khắc phục lỗi cập nhật "Gói không hợp lệ" (Thiếu chữ ký APK)
 
-- **Ngày thực hiện**: 2026-10-31 13:25:00
+- **Ngày thực hiện**: 2026-10-31 13:33:00
 - **Agent phụ trách**: `qa-perf-specialist`, `lead-architect`, `storage-data-specialist`
 - **Yêu cầu gốc**: Rà soát và kiểm tra fix v1.0.1 không update lên được do báo "Gói không hợp lệ"
-- **Trạng thái**: 🔄 Đang kiểm thử & chuẩn bị phát hành v1.1.1
+- **Trạng thái**: ✅ Hoàn thành (Đã phát hành bản vá v1.1.1 có chữ ký số hợp lệ)
 
 ---
 
@@ -30,7 +30,7 @@ Khi người dùng đang sử dụng phiên bản `v1.0.1` nhấn **Cập nhật
 
 ### Bước 1: Cấu hình ký số Release trong `app/build.gradle.kts`
 - Gán `signingConfig = signingConfigs.getByName("debug")` cho `buildTypes.release`.
-- Đảm bảo APK phát hành luôn được ký bởi cùng Keystore đồng nhất với bản đang chạy trên thiết bị người dùng.
+- Đảm bảo APK phát hành luôn được ký bởi cùng Keystore đồng nhất (`SHA-256: e18c408c52c5664f3a67e8f671f63ebfcbfe0c414bad8e49ffaa2dd250082ee2`) với bản đang chạy trên thiết bị người dùng.
 
 ### Bước 2: Gia cố `ApkInstaller.kt` & `file_paths.xml`
 - Thêm cờ `apkFile.setReadable(true, false)` để file APK có quyền đọc toàn hệ thống trên Linux/Android filesystem.
@@ -42,29 +42,41 @@ Khi người dùng đang sử dụng phiên bản `v1.0.1` nhấn **Cập nhật
 - Ngăn ngừa tải nhầm file APK chưa ký nếu repository có nhiều assets.
 
 ### Bước 4: Tối ưu GitHub Actions Workflow `.github/workflows/release.yml`
-- Loại bỏ cờ fallback mơ hồ, bắt buộc tìm đúng `app-release.apk` hoặc loại trừ `*unsigned*`.
+- Bắt buộc tìm đúng `app-release.apk` hoặc loại trừ `*unsigned*`.
 - Dừng quy trình (exit 1) ngay nếu không tìm thấy APK đã ký.
+
+### Bước 5: Phát hành bản vá `v1.1.1` (Build 4)
+- Chạy kiểm thử tự động `compileDebugKotlin` và `testDebugUnitTest` (BUILD SUCCESSFUL).
+- Tự động sinh Release Notes và tạo Git Tag `v1.1.1`.
+- Kích hoạt GitHub Actions đóng gói và đưa asset `app-release.apk` lên GitHub Release.
 
 ---
 
 ## 3. Danh Sách Tệp Thay Đổi (Impacted Files)
-- `[Modified]` `app/build.gradle.kts`: Thêm `signingConfig = signingConfigs.getByName("debug")` cho release.
+- `[Modified]` `app/build.gradle.kts`: Thêm `signingConfig = signingConfigs.getByName("debug")` cho release; nâng version lên `1.1.1` (Build 4).
 - `[Modified]` `app/src/main/res/xml/file_paths.xml`: Bổ sung đường dẫn cache, external cache, files.
 - `[Modified]` `app/src/main/java/com/apple/android/music/data/local/updater/ApkInstaller.kt`: `setReadable(true, false)` và `grantUriPermission` đa package.
 - `[Modified]` `app/src/main/java/com/apple/android/music/data/repository/UpdateRepositoryImpl.kt`: Bỏ qua asset có nhãn `unsigned`.
-- `[Modified]` `.github/workflows/release.yml`: Khóa chặt logic đóng gói và upload APK đã ký.
+- `[Modified]` `.github/workflows/release.yml`: Khóa chặt logic đóng gói và upload APK đã ký `app-release.apk`.
 
 ---
 
 ## 4. Kiểm Thử & Xác Minh (Verification & Testing)
-- Chạy unit tests: `./gradlew testDebugUnitTest`
-- Build release APK: `./gradlew assembleRelease`
-- Kiểm tra chữ ký bằng `apksigner`:
-  - `APK Signature Scheme v2: true`
-  - Digest SHA-256: `e18c408c52c5664f3a67e8f671f63ebfcbfe0c414bad8e49ffaa2dd250082ee2` (Khớp 100% với debug APK).
-- Phát hành bản vá `v1.1.1` và kiểm tra GitHub Release asset.
+1. **Kiểm tra chữ ký số bằng `apksigner`**:
+   ```text
+   Verifies
+   Verified using v2 scheme (APK Signature Scheme v2): true
+   Signer #1 certificate DN: C=US, O=Android, CN=Android Debug
+   Signer #1 certificate SHA-256 digest: e18c408c52c5664f3a67e8f671f63ebfcbfe0c414bad8e49ffaa2dd250082ee2
+   ```
+   => Khớp 100% với chứng chỉ ký số của `v1.0.1` đang cài đặt trên máy người dùng.
+2. **Kiểm tra GitHub Release v1.1.1**:
+   - Tag: `v1.1.1`
+   - Asset: `app-release.apk` (15,232,635 bytes)
+   - HTTP Status: `200 OK`, `Content-Type: application/vnd.android.package-archive`.
 
 ---
 
 ## 5. Kết Luận & Hướng Dẫn Tiếp Theo (Conclusion & Next Steps)
-- Bản cập nhật `v1.1.1` sẽ được đóng gói và ký đầy đủ, cho phép người dùng từ `v1.0.1` nâng cấp mượt mà trực tiếp trong ứng dụng.
+- Người dùng đang ở phiên bản `v1.0.1` hiện tại chỉ cần mở màn hình **Cài đặt -> Kiểm tra bản cập nhật** (hoặc nhận thông báo popup tự động) để cập nhật thẳng lên `v1.1.1`.
+- Android PackageInstaller sẽ cài đặt cập nhật đè trực tiếp mà không còn xuất hiện lỗi "Gói không hợp lệ".
