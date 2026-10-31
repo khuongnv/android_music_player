@@ -76,12 +76,18 @@ fun TimelineScreen(
             // Apple Music Large Page Title
             item {
                 Text(
-                    text = "Hoạt động 24h",
+                    text = "Ký ức",
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 34.sp
                     ),
-                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 4.dp)
+                )
+                Text(
+                    text = "Dòng thời gian và nhật ký âm nhạc trong 24 giờ qua",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Gray93,
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 12.dp)
                 )
             }
 
@@ -97,7 +103,7 @@ fun TimelineScreen(
             item {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "DÒNG THỜI GIAN TƯƠNG TÁC (24H)",
+                    text = "DÒNG THỜI GIAN KÝ ỨC (24H)",
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.SemiBold,
                         letterSpacing = 0.8.sp,
@@ -134,7 +140,7 @@ fun TimelineScreen(
             item {
                 Spacer(modifier = Modifier.height(28.dp))
                 Text(
-                    text = "CÁC PHIÊN PHÁT NHẠC GẦN ĐÂY",
+                    text = "KÝ ỨC PHÁT NHẠC GẦN ĐÂY",
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.SemiBold,
                         letterSpacing = 0.8.sp,
@@ -162,7 +168,7 @@ fun TimelineScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Chưa có dữ liệu hoạt động trong 24 giờ qua.",
+                                text = "Chưa có ký ức phát nhạc trong 24 giờ qua.",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Gray93
                             )

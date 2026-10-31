@@ -381,8 +381,14 @@ class SettingsViewModel @Inject constructor(
         if (status is UpdateStatus.ReadyToInstall) {
             val result = ApkInstaller.installApk(context, status.apkFile)
             result.onFailure { error ->
-                _uiState.update {
-                    it.copy(updateStatus = UpdateStatus.Error(error.message ?: "Không thể mở file cài đặt."))
+                if (error is SecurityException) {
+                    _uiState.update {
+                        it.copy(toastMessage = "Vui lòng cấp quyền cài đặt từ nguồn này rồi bấm Cài đặt lại.")
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(updateStatus = UpdateStatus.Error(error.message ?: "Không thể mở file cài đặt."))
+                    }
                 }
             }
         }

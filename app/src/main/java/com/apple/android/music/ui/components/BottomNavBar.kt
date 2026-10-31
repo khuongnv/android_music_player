@@ -1,30 +1,33 @@
 package com.apple.android.music.ui.components
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.LibraryMusic
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.LibraryMusic
-import androidx.compose.material.icons.outlined.Schedule
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.apple.android.music.ui.theme.AppleRed
 import com.apple.android.music.ui.theme.Gray93
 
 /**
- * Bottom navigation destinations with Apple Music labels
+ * Bottom navigation destinations with refined Apple Music labels and aesthetics
  */
 sealed class BottomNavItem(
     val route: String,
@@ -39,13 +42,13 @@ sealed class BottomNavItem(
         unselectedIcon = Icons.Outlined.LibraryMusic
     )
 
-    object Timeline : BottomNavItem(
+    object Memories : BottomNavItem(
         route = "timeline",
-        title = "Timeline 24h",
-        selectedIcon = Icons.Filled.Schedule,
-        unselectedIcon = Icons.Outlined.Schedule
+        title = "Ký ức",
+        selectedIcon = Icons.Filled.AutoAwesome,
+        unselectedIcon = Icons.Outlined.AutoAwesome
     )
-    
+
     object Settings : BottomNavItem(
         route = "settings",
         title = "Cài đặt",
@@ -56,12 +59,15 @@ sealed class BottomNavItem(
 
 val bottomNavItems = listOf(
     BottomNavItem.Library,
-    BottomNavItem.Timeline,
+    BottomNavItem.Memories,
     BottomNavItem.Settings
 )
 
 /**
- * Redesigned Bottom Navigation Bar for Apple Music look
+ * Refined Apple Music Tab Bar:
+ * - Sleek 52dp height with signature Apple hairline top divider
+ * - Translucent surface matching dynamic Light/Dark theme
+ * - Crisp typography and icons with AppleRed accent
  */
 @Composable
 fun BottomNavBar(
@@ -69,39 +75,58 @@ fun BottomNavBar(
     onNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    NavigationBar(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 8.dp
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp
     ) {
-        bottomNavItems.forEach { item ->
-            val selected = currentRoute == item.route
-            
-            NavigationBarItem(
-                selected = selected,
-                onClick = { onNavigate(item.route) },
-                icon = {
-                    Icon(
-                        imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
-                        contentDescription = item.title,
-                        modifier = Modifier.size(24.dp)
-                    )
-                },
-                label = {
-                    Text(
-                        text = item.title,
-                        fontSize = 11.sp,
-                        fontWeight = if (selected) androidx.compose.ui.text.font.FontWeight.SemiBold else androidx.compose.ui.text.font.FontWeight.Normal
-                    )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = AppleRed,
-                    selectedTextColor = AppleRed,
-                    unselectedIconColor = Gray93,
-                    unselectedTextColor = Gray93,
-                    indicatorColor = Color.Transparent
-                )
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Apple Hairline Top Border
+            HorizontalDivider(
+                thickness = 0.5.dp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
             )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+                    .navigationBarsPadding(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                bottomNavItems.forEach { item ->
+                    val isSelected = currentRoute == item.route
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = { onNavigate(item.route) }
+                            ),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                            contentDescription = item.title,
+                            tint = if (isSelected) AppleRed else Gray93,
+                            modifier = Modifier.size(23.dp)
+                        )
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = item.title,
+                            fontSize = 10.5.sp,
+                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                            color = if (isSelected) AppleRed else Gray93,
+                            letterSpacing = (-0.2).sp
+                        )
+                    }
+                }
+            }
         }
     }
 }
