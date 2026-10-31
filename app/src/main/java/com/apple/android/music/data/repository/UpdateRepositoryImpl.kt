@@ -1,8 +1,12 @@
 package com.apple.android.music.data.repository
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import com.apple.android.music.domain.model.AppUpdateInfo
 import com.apple.android.music.domain.model.UpdateDownloadProgress
 import com.apple.android.music.domain.repository.UpdateRepository
@@ -33,6 +37,7 @@ class UpdateRepositoryImpl @Inject constructor(
         private const val USER_AGENT = "AppleMusic-Android-Updater"
         private const val UPDATE_DIR = "updates"
         private const val APK_FILE_NAME = "update.apk"
+        private const val PUBLIC_APK_FILE_NAME = "AppleMusic_Update.apk"
     }
 
     override fun getCurrentVersionName(): String {
@@ -202,6 +207,9 @@ class UpdateRepositoryImpl @Inject constructor(
             }
         }
 
+        // Export copy to Public Downloads directory so user retains the APK even if uninstalled
+        saveApkToPublicDownloads(apkFile)
+
         // Final 100% emission
         emit(
             UpdateDownloadProgress(
@@ -212,15 +220,71 @@ class UpdateRepositoryImpl @Inject constructor(
         )
     }.flowOn(Dispatchers.IO)
 
+    private fun saveApkToPublicDownloads(sourceFile: File) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val resolver = context.contentResolver
+                try {
+                    val selection = "${MediaStore.MediaColumns.DISPLAY_NAME} = ? AND ${MediaStore.MediaColumns.RELATIVE_PATH} LIKE ?"
+                    val selectionArgs = arrayOf(PUBLIC_APK_FILE_NAME, "${Environment.DIRECTORY_DOWNLOADS}%")
+                    resolver.delete(MediaStore.Downloads.EXTERNAL_CONTENT_URI, selection, selectionArgs)
+                } catch (ignored: Exception) {}
+
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, PUBLIC_APK_FILE_NAME)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "application/vnd.android.package-archive")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                    put(MediaStore.MediaColumns.IS_PENDING, 1)
+                }
+
+                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                if (uri != null) {
+                    resolver.openOutputStream(uri)?.use { out ->
+                        sourceFile.inputStream().use { input ->
+                            input.copyTo(out)
+                        }
+                        out.flush()
+                    }
+                    contentValues.clear()
+                    contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
+                    resolver.update(uri, contentValues, null, null)
+                    Log.d("UpdateRepo", "Saved APK to MediaStore.Downloads: $PUBLIC_APK_FILE_NAME")
+                }
+            }
+
+            // Also copy directly to public Environment.DIRECTORY_DOWNLOADS file if accessible
+            val publicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            if (publicDir.exists() || publicDir.mkdirs()) {
+                val targetFile = File(publicDir, PUBLIC_APK_FILE_NAME)
+                sourceFile.copyTo(targetFile, overwrite = true)
+                targetFile.setReadable(true, false)
+                Log.d("UpdateRepo", "Saved APK to direct Downloads: ${targetFile.absolutePath}")
+            }
+        } catch (e: Exception) {
+            Log.e("UpdateRepo", "Failed to save APK to public downloads folder", e)
+        }
+    }
+
     override fun getDownloadedApkFile(): File? {
-        val apkFile = File(File(context.cacheDir, UPDATE_DIR), APK_FILE_NAME)
-        return if (apkFile.exists() && apkFile.length() > 0) apkFile else null
+        val cacheApk = File(File(context.cacheDir, UPDATE_DIR), APK_FILE_NAME)
+        if (cacheApk.exists() && cacheApk.length() > 0) return cacheApk
+
+        val publicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val publicApk = File(publicDir, PUBLIC_APK_FILE_NAME)
+        if (publicApk.exists() && publicApk.length() > 0) return publicApk
+
+        return null
     }
 
     override fun deleteDownloadedApk() {
-        val apkFile = File(File(context.cacheDir, UPDATE_DIR), APK_FILE_NAME)
-        if (apkFile.exists()) {
-            apkFile.delete()
+        val cacheApk = File(File(context.cacheDir, UPDATE_DIR), APK_FILE_NAME)
+        if (cacheApk.exists()) {
+            cacheApk.delete()
+        }
+        val publicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val publicApk = File(publicDir, PUBLIC_APK_FILE_NAME)
+        if (publicApk.exists()) {
+            publicApk.delete()
         }
     }
 

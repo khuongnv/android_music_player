@@ -1,23 +1,35 @@
 package com.apple.android.music.ui.screens.artists
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.apple.android.music.domain.model.Artist
+import com.apple.android.music.ui.theme.AppleRed
+import com.apple.android.music.ui.theme.DarkBackground
+import com.apple.android.music.ui.theme.Gray93
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,16 +39,37 @@ fun ArtistsScreen(
     viewModel: ArtistsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.artistsState.collectAsState()
+    val isDark = MaterialTheme.colorScheme.background == DarkBackground
+
+    val glassBg = if (isDark) Color(0xEE1E1E22) else Color(0xF2FFFFFF)
+    val glassBorder = if (isDark) Color(0x33FFFFFF) else Color(0x1F000000)
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Artists") },
+                title = { 
+                    Column {
+                        Text(
+                            "Nghệ sĩ",
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                        if (uiState.artists.isNotEmpty()) {
+                            Text(
+                                "${uiState.artists.size} nghệ sĩ",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Gray93
+                            )
+                        }
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Quay lại")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -50,11 +83,17 @@ fun ArtistsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                contentPadding = PaddingValues(bottom = 80.dp)
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 120.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(uiState.artists) { artist ->
-                    ArtistItem(artist = artist, onClick = { onArtistClick(artist.name) })
-                    HorizontalDivider(modifier = Modifier.padding(start = 20.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
+                    LiquidGlassArtistCard(
+                        artist = artist,
+                        glassBg = glassBg,
+                        glassBorder = glassBorder,
+                        isDark = isDark,
+                        onClick = { onArtistClick(artist.name) }
+                    )
                 }
             }
         }
@@ -62,30 +101,86 @@ fun ArtistsScreen(
 }
 
 @Composable
-fun ArtistItem(
+fun LiquidGlassArtistCard(
     artist: Artist,
+    glassBg: Color,
+    glassBorder: Color,
+    isDark: Boolean,
     onClick: () -> Unit
 ) {
-    Row(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column {
-            Text(
-                text = artist.name,
-                style = MaterialTheme.typography.titleMedium
+            .shadow(
+                elevation = if (isDark) 6.dp else 2.dp,
+                shape = RoundedCornerShape(18.dp),
+                spotColor = if (isDark) Color(0x40000000) else Color(0x15000000)
             )
-            // Optional count
-            // Text("${artist.songCount} songs", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            .border(
+                BorderStroke(0.75.dp, glassBorder),
+                shape = RoundedCornerShape(18.dp)
+            )
+            .clip(RoundedCornerShape(18.dp))
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(18.dp),
+        color = glassBg,
+        tonalElevation = 0.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
+                // Circular artist avatar with AppleRed tint
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(AppleRed.copy(alpha = 0.12f))
+                        .border(BorderStroke(0.5.dp, AppleRed.copy(alpha = 0.25f)), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = AppleRed,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(14.dp))
+
+                Column {
+                    Text(
+                        text = artist.name,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "${artist.songCount} bài hát",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontSize = 12.sp
+                        ),
+                        color = Gray93
+                    )
+                }
+            }
+
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = Gray93.copy(alpha = 0.5f),
+                modifier = Modifier.size(20.dp)
+            )
         }
-        Icon(
-            imageVector = Icons.Default.ChevronRight,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-        )
     }
 }

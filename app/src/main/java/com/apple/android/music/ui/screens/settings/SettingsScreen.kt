@@ -845,6 +845,8 @@ private fun UpdateModalDialog(
     onDownloadClick: () -> Unit,
     onInstallClick: () -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+
     Dialog(
         onDismissRequest = {
             if (status !is UpdateStatus.Downloading) {
@@ -1033,9 +1035,10 @@ private fun UpdateModalDialog(
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Bản cập nhật đã sẵn sàng để cài đặt.",
+                            text = "Bản cập nhật đã được lưu an toàn tại thư mục Tải về:\n📁 Download/AppleMusic_Update.apk\n\nBạn có thể bấm Cài đặt ngay. Nếu cần gỡ bản cũ trước, tệp APK vẫn lưu sẵn trong thư mục Download để bạn cài đặt bất cứ lúc nào.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Gray93
+                            color = Gray93,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(20.dp))
 
@@ -1046,6 +1049,29 @@ private fun UpdateModalDialog(
                             colors = ButtonDefaults.buttonColors(containerColor = AppleRed)
                         ) {
                             Text("Cài đặt ngay", fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = {
+                                try {
+                                    val dlIntent = android.content.Intent(android.app.DownloadManager.ACTION_VIEW_DOWNLOADS).apply {
+                                        flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                    }
+                                    context.startActivity(dlIntent)
+                                } catch (e: Exception) {
+                                    try {
+                                        val fileIntent = android.content.Intent(android.content.Intent.ACTION_GET_CONTENT).apply {
+                                            type = "*/*"
+                                            flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                        }
+                                        context.startActivity(fileIntent)
+                                    } catch (ignored: Exception) {}
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Mở thư mục Download", color = AppleRed, fontWeight = FontWeight.SemiBold)
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
