@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local tools & media downloads
+ffmpeg.exe
+yt-dlp.exe
+Tuyệt thế dược thần/
