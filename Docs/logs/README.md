@@ -8,6 +8,7 @@ Thư mục này lưu trữ toàn bộ nhật ký chi tiết về các bước th
 
 | Ngày | Tên Tệp Log | Nhiệm Vụ / Tính Năng | Agent Phụ Trách | Trạng Thái |
 | :--- | :--- | :--- | :--- | :--- |
+| 2026-10-31 | [`2026-10-31_migrate_media_downloader_to_standalone_project.md`](./2026-10-31_migrate_media_downloader_to_standalone_project.md) | Chuyển giao & Tách toàn bộ việc download nhạc sang repository độc lập `download-ytb-mp3` | `lead-architect`, `storage-data-specialist` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_embed_metadata_and_album_art_tuyet_the_duoc_than.md`](./2026-10-31_embed_metadata_and_album_art_tuyet_the_duoc_than.md) | Nhúng ảnh bìa & ID3v2 metadata chuẩn (tiêu đề, tác giả, tập, album, playlist M3U) cho Tuyệt Thế Dược Thần (Tập 102 - 120) | `storage-data-specialist`, `lead-architect` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_fix_theme_propagation_and_dark_mode_consistency.md`](./2026-10-31_fix_theme_propagation_and_dark_mode_consistency.md) | Khắc Phục Lỗi Áp Dụng Theme & Đồng Bộ Toàn Diện Dark/Light Mode | `lead-architect`, `compose-ui-specialist` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_persist_download_apk_and_liquid_glass_library.md`](./2026-10-31_persist_download_apk_and_liquid_glass_library.md) | Tối ưu lưu trữ file cập nhật vào thư mục Download & Chuẩn hóa Liquid Glass toàn bộ Thư viện | `lead-architect`, `storage-data-specialist`, `compose-ui-specialist` | ✅ Hoàn thành |
