@@ -6,10 +6,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,10 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.apple.android.music.ui.theme.AppleRed
 import com.apple.android.music.ui.screens.albums.AlbumGridItem
-
-import androidx.compose.material.icons.automirrored.filled.QueueMusic
+import com.apple.android.music.ui.theme.AppleRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +36,7 @@ fun LibraryScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
+        topBar = { },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         LazyColumn(
@@ -61,7 +62,8 @@ fun LibraryScreen(
                 Triple("Playlists", Icons.AutoMirrored.Filled.QueueMusic, "playlists"),
                 Triple("Artists", Icons.Default.Person, "artists"),
                 Triple("Albums", Icons.Default.Album, "albums"),
-                Triple("Songs", Icons.Default.MusicNote, "songs")
+                Triple("Songs", Icons.Default.MusicNote, "songs"),
+                Triple("Hoạt động 24h (Timeline)", Icons.Default.Schedule, "timeline")
             )
             
             items(menuItems) { (title, icon, route) ->

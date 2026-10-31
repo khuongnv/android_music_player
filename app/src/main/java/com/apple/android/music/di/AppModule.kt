@@ -7,18 +7,21 @@ import com.apple.android.music.data.local.mediastore.MediaStoreDataSource
 import com.apple.android.music.data.local.room.MusicDatabase
 import com.apple.android.music.data.local.room.dao.AlbumDao
 import com.apple.android.music.data.local.room.dao.ArtistDao
+import com.apple.android.music.data.local.room.dao.PlaybackActivityDao
 import com.apple.android.music.data.local.room.dao.PlaylistDao
 import com.apple.android.music.data.local.room.dao.SongDao
 import com.apple.android.music.data.repository.MusicRepositoryImpl
-import com.apple.android.music.data.repository.PlaylistRepositoryImpl
-import com.apple.android.music.domain.repository.MusicRepository
-import com.apple.android.music.domain.repository.PlaylistRepository
-import com.apple.android.music.domain.repository.PlayerStateRepository
-import com.apple.android.music.domain.repository.SettingsRepository
-import com.apple.android.music.domain.repository.UpdateRepository
 import com.apple.android.music.data.repository.PlayerStateRepositoryImpl
+import com.apple.android.music.data.repository.PlaylistRepositoryImpl
 import com.apple.android.music.data.repository.SettingsRepositoryImpl
+import com.apple.android.music.data.repository.TimelineRepositoryImpl
 import com.apple.android.music.data.repository.UpdateRepositoryImpl
+import com.apple.android.music.domain.repository.MusicRepository
+import com.apple.android.music.domain.repository.PlayerStateRepository
+import com.apple.android.music.domain.repository.PlaylistRepository
+import com.apple.android.music.domain.repository.SettingsRepository
+import com.apple.android.music.domain.repository.TimelineRepository
+import com.apple.android.music.domain.repository.UpdateRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -76,6 +79,23 @@ object DatabaseModule {
     fun provideArtistDao(database: MusicDatabase): ArtistDao {
         return database.artistDao()
     }
+
+    @Provides
+    @Singleton
+    fun providePlaybackActivityDao(database: MusicDatabase): PlaybackActivityDao {
+        return database.playbackActivityDao()
+    }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DataSourceModule {
+
+    @Provides
+    @Singleton
+    fun provideMediaStoreDataSource(contentResolver: ContentResolver): MediaStoreDataSource {
+        return MediaStoreDataSource(contentResolver)
+    }
 }
 
 @Module
@@ -101,4 +121,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindUpdateRepository(impl: UpdateRepositoryImpl): UpdateRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTimelineRepository(impl: TimelineRepositoryImpl): TimelineRepository
 }

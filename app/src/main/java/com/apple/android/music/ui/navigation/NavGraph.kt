@@ -11,6 +11,7 @@ import com.apple.android.music.ui.screens.album.AlbumDetailScreen
 import com.apple.android.music.ui.screens.home.HomeScreen
 import com.apple.android.music.ui.screens.library.LibraryScreen
 import com.apple.android.music.ui.screens.settings.SettingsScreen
+import com.apple.android.music.ui.screens.timeline.TimelineScreen
 
 /**
  * Main navigation graph for the app
@@ -70,6 +71,10 @@ fun NavGraph(
             AlbumDetailScreen(
                 onBackClick = { navController.popBackStack() }
             )
+        }
+
+        composable("timeline") {
+            TimelineScreen()
         }
         
         composable("settings") {

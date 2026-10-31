@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LibraryMusic
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
@@ -32,14 +34,21 @@ sealed class BottomNavItem(
 ) {
     object Library : BottomNavItem(
         route = "library",
-        title = "Library",
+        title = "Thư viện",
         selectedIcon = Icons.Filled.LibraryMusic,
         unselectedIcon = Icons.Outlined.LibraryMusic
+    )
+
+    object Timeline : BottomNavItem(
+        route = "timeline",
+        title = "Timeline 24h",
+        selectedIcon = Icons.Filled.Schedule,
+        unselectedIcon = Icons.Outlined.Schedule
     )
     
     object Settings : BottomNavItem(
         route = "settings",
-        title = "Settings",
+        title = "Cài đặt",
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings
     )
@@ -47,6 +56,7 @@ sealed class BottomNavItem(
 
 val bottomNavItems = listOf(
     BottomNavItem.Library,
+    BottomNavItem.Timeline,
     BottomNavItem.Settings
 )
 
@@ -61,8 +71,8 @@ fun BottomNavBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp // No material Elevation tint
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 8.dp
     ) {
         bottomNavItems.forEach { item ->
             val selected = currentRoute == item.route
@@ -74,16 +84,14 @@ fun BottomNavBar(
                     Icon(
                         imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
                         contentDescription = item.title,
-                        modifier = Modifier.size(26.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 },
                 label = {
                     Text(
                         text = item.title,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize = 10.sp,
-                            letterSpacing = 0.5.sp
-                        )
+                        fontSize = 11.sp,
+                        fontWeight = if (selected) androidx.compose.ui.text.font.FontWeight.SemiBold else androidx.compose.ui.text.font.FontWeight.Normal
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
@@ -91,7 +99,7 @@ fun BottomNavBar(
                     selectedTextColor = AppleRed,
                     unselectedIconColor = Gray93,
                     unselectedTextColor = Gray93,
-                    indicatorColor = Color.Transparent // Hide the pill indicator
+                    indicatorColor = Color.Transparent
                 )
             )
         }

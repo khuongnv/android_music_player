@@ -167,6 +167,21 @@ class MusicServiceConnection @Inject constructor(
         }
     }
 
+    fun playSongAtPosition(song: Song, positionMs: Long) {
+        val controller = mediaController ?: return
+        val current = _currentSong.value
+        if (current?.id == song.id) {
+            controller.seekTo(positionMs)
+            controller.play()
+        } else {
+            val mediaItem = song.toMediaItem()
+            controller.setMediaItem(mediaItem, positionMs)
+            controller.prepare()
+            controller.play()
+        }
+        _currentPosition.value = positionMs
+    }
+
     fun playSongs(songs: List<Song>, startIndex: Int = 0) {
         Log.d("MusicApp", "MusicServiceConnection: playSongs called with ${songs.size} songs, index $startIndex")
         if (mediaController == null) {

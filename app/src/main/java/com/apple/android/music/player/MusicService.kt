@@ -8,6 +8,7 @@ import androidx.media3.session.*
 import com.apple.android.music.domain.model.PlayerState
 import com.apple.android.music.domain.repository.MusicRepository
 import com.apple.android.music.domain.repository.PlayerStateRepository
+import com.apple.android.music.domain.repository.TimelineRepository
 import com.apple.android.music.util.toMediaItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -27,6 +28,7 @@ class MusicService : MediaSessionService() {
     @Inject lateinit var playerStateRepository: PlayerStateRepository
     @Inject lateinit var musicRepository: MusicRepository
     @Inject lateinit var settingsRepository: com.apple.android.music.domain.repository.SettingsRepository
+    @Inject lateinit var timelineRepository: TimelineRepository
 
     private var mediaSession: MediaSession? = null
     private var player: ExoPlayer? = null
@@ -38,6 +40,9 @@ class MusicService : MediaSessionService() {
     
     // Sleep Timer
     private var sleepTimerJob: Job? = null
+
+    // 24h Playback Activity Tracking
+    private var activityTrackingJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -77,6 +82,20 @@ class MusicService : MediaSessionService() {
                 }
                 Log.d("MusicApp", "MusicService: Playback state changed to $stateName")
             }
+
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) {
+                    serviceScope.launch { recordPlaybackActivity() }
+                    startActivityTracking()
+                } else {
+                    activityTrackingJob?.cancel()
+                    serviceScope.launch { recordPlaybackActivity() }
+                }
+            }
+
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                serviceScope.launch { recordPlaybackActivity() }
+            }
         })
 
         // Restore latest state and start autosave ticker
@@ -84,7 +103,42 @@ class MusicService : MediaSessionService() {
             restorePlayerState()
             startAutosaveTicker()
             observeSleepTimer()
+            timelineRepository.ensureSampleActivitiesIfEmpty()
         }
+    }
+
+    private fun startActivityTracking() {
+        activityTrackingJob?.cancel()
+        activityTrackingJob = serviceScope.launch {
+            while (isActive) {
+                delay(10000L) // Record activity progress every 10 seconds
+                recordPlaybackActivity()
+            }
+        }
+    }
+
+    private suspend fun recordPlaybackActivity() {
+        val currentPlayer = player ?: return
+        val currentMediaItem = currentPlayer.currentMediaItem ?: return
+        val songId = currentMediaItem.mediaId.toLongOrNull() ?: return
+        val title = currentMediaItem.mediaMetadata.title?.toString() ?: "Unknown Title"
+        val artist = currentMediaItem.mediaMetadata.artist?.toString() ?: "Unknown Artist"
+        val album = currentMediaItem.mediaMetadata.albumTitle?.toString() ?: "Unknown Album"
+        val artworkUri = currentMediaItem.mediaMetadata.artworkUri?.toString()
+        val songUri = currentMediaItem.requestMetadata.mediaUri?.toString() ?: ""
+        val duration = if (currentPlayer.duration != C.TIME_UNSET) currentPlayer.duration else 0L
+        val position = currentPlayer.currentPosition.coerceAtLeast(0L)
+
+        timelineRepository.recordActivity(
+            songId = songId,
+            songTitle = title,
+            artistName = artist,
+            albumName = album,
+            artworkUri = artworkUri,
+            songUri = songUri,
+            songDuration = duration,
+            currentPosition = position
+        )
     }
 
     private fun observeSleepTimer() {
@@ -266,6 +320,7 @@ class MusicService : MediaSessionService() {
         serviceScope.launch {
             saveCurrentState()
             autosaveJob?.cancel()
+            activityTrackingJob?.cancel()
             serviceScope.cancel()
         }
         mediaSession?.run {
