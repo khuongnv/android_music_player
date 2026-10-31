@@ -534,32 +534,6 @@ fun SettingsScreen(
                 SettingsSectionHeader(title = "THÔNG TIN ỨNG DỤNG")
                 SettingsGroupCard {
                     SettingsRow(
-                        icon = Icons.Default.Info,
-                        iconBackground = Gray93,
-                        title = "Apple Music (Offline)",
-                        subtitle = "Phiên bản v${uiState.currentVersion} • Hoạt động thuần Offline",
-                        trailing = {
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant
-                            ) {
-                                Text(
-                                    text = "v${uiState.currentVersion}",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Gray93,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
-                        }
-                    )
-
-                    HorizontalDivider(
-                        thickness = 0.5.dp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
-                        modifier = Modifier.padding(start = 64.dp)
-                    )
-
-                    SettingsRow(
                         icon = Icons.Default.Code,
                         iconBackground = Color(0xFF3A3A3C),
                         title = "Mã nguồn trên GitHub",
