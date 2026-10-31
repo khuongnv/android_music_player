@@ -149,8 +149,8 @@ class MainActivity : ComponentActivity() {
                                             onNextClick = { playerViewModel.playNext() },
                                             onClick = { isPlayerExpanded = true },
                                             modifier = Modifier
-                                                .padding(horizontal = 8.dp)
-                                                .padding(bottom = 8.dp)
+                                                .padding(horizontal = 16.dp)
+                                                .padding(bottom = 6.dp)
                                         )
                                         
                                         BottomNavBar(
