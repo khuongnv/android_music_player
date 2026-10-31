@@ -1,5 +1,6 @@
 package com.apple.android.music.ui.screens.settings
 
+import com.apple.android.music.domain.model.ThemeMode
 import com.apple.android.music.domain.model.UpdateStatus
 
 data class FolderInfo(
@@ -10,6 +11,9 @@ data class FolderInfo(
 )
 
 data class SettingsUiState(
+    // Theme & Display
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+
     // Folders & Library
     val folders: List<FolderInfo> = emptyList(),
     val isScanning: Boolean = false,

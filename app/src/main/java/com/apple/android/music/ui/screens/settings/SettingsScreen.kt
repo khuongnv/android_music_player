@@ -40,10 +40,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.apple.android.music.domain.model.ThemeMode
 import com.apple.android.music.domain.model.UpdateStatus
 import com.apple.android.music.ui.theme.AppleRed
-import com.apple.android.music.ui.theme.DarkSurface
-import com.apple.android.music.ui.theme.DarkSurfaceVariant
 import com.apple.android.music.ui.theme.Gray93
 import java.util.Locale
 
@@ -113,6 +112,67 @@ fun SettingsScreen(
                 )
             }
 
+            // --- SECTION: GIAO DIỆN & CHỦ ĐỀ (THEME) ---
+            item {
+                SettingsSectionHeader(title = "GIAO DIỆN & CHỦ ĐỀ")
+                SettingsGroupCard {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0xFF007AFF)), // iOS Blue
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Palette,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(14.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Chế độ giao diện",
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 16.sp
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = when (uiState.themeMode) {
+                                        ThemeMode.SYSTEM -> "Theo hệ thống"
+                                        ThemeMode.LIGHT -> "Giao diện Sáng (Light)"
+                                        ThemeMode.DARK -> "Giao diện Tối (AMOLED Dark)"
+                                    },
+                                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.sp),
+                                    color = Gray93,
+                                    modifier = Modifier.padding(top = 2.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        // Apple-style 3-Segment Control
+                        ThemeSegmentedPicker(
+                            selectedMode = uiState.themeMode,
+                            onSelectMode = { viewModel.setThemeMode(it) }
+                        )
+                    }
+                }
+            }
+
             // --- SECTION 1: CẬP NHẬT PHẦN MỀM ---
             item {
                 SettingsSectionHeader(title = "BẢN CẬP NHẬT PHẦN MỀM")
@@ -180,7 +240,7 @@ fun SettingsScreen(
                                     checkedThumbColor = Color.White,
                                     checkedTrackColor = AppleRed,
                                     uncheckedThumbColor = Gray93,
-                                    uncheckedTrackColor = DarkSurfaceVariant
+                                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
                                 )
                             )
                         }
@@ -551,7 +611,7 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { viewModel.showClearCacheConfirmation(false) },
             shape = RoundedCornerShape(20.dp),
-            containerColor = DarkSurface,
+            containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
                     text = "Dọn dẹp bộ nhớ đệm?",
@@ -590,7 +650,7 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { showCustomDurationDialog = false },
             shape = RoundedCornerShape(20.dp),
-            containerColor = DarkSurface,
+            containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
                     text = "Tùy chỉnh thời gian hẹn giờ",
@@ -694,7 +754,7 @@ private fun SettingsGroupCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         shape = RoundedCornerShape(14.dp),
-        color = DarkSurface
+        color = MaterialTheme.colorScheme.surface
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -798,7 +858,7 @@ private fun UpdateModalDialog(
     ) {
         Surface(
             shape = RoundedCornerShape(22.dp),
-            color = DarkSurface,
+            color = MaterialTheme.colorScheme.surface,
             tonalElevation = 8.dp,
             modifier = Modifier
                 .fillMaxWidth()
@@ -1070,6 +1130,68 @@ private fun UpdateModalDialog(
                     }
 
                     else -> {}
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ThemeSegmentedPicker(
+    selectedMode: ThemeMode,
+    onSelectMode: (ThemeMode) -> Unit
+) {
+    val options = listOf(
+        Triple(ThemeMode.SYSTEM, "Hệ thống", Icons.Default.BrightnessAuto),
+        Triple(ThemeMode.LIGHT, "Sáng", Icons.Default.LightMode),
+        Triple(ThemeMode.DARK, "Tối", Icons.Default.DarkMode)
+    )
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(3.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            options.forEach { (mode, label, icon) ->
+                val isSelected = selectedMode == mode
+                Surface(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onSelectMode(mode) },
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) AppleRed else Color.Transparent,
+                    shadowElevation = if (isSelected) 2.dp else 0.dp
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                fontSize = 13.sp
+                            ),
+                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }

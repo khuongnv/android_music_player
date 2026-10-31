@@ -49,7 +49,7 @@ fun MiniPlayer(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.background == com.apple.android.music.ui.theme.DarkBackground
     val bgColor = if (isDark) MiniPlayerBackgroundDark else MiniPlayerBackgroundLight
 
     AnimatedVisibility(

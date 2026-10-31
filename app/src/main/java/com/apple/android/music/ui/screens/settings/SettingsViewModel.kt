@@ -8,6 +8,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apple.android.music.data.local.updater.ApkInstaller
+import com.apple.android.music.domain.model.ThemeMode
 import com.apple.android.music.domain.model.UpdateStatus
 import com.apple.android.music.domain.repository.MusicRepository
 import com.apple.android.music.domain.repository.SettingsRepository
@@ -48,10 +49,25 @@ class SettingsViewModel @Inject constructor(
     private var timerTickerJob: Job? = null
 
     init {
+        observeThemeMode()
         loadFolders()
         observeSleepTimer()
         loadCacheSize()
         checkCachedApk()
+    }
+
+    private fun observeThemeMode() {
+        viewModelScope.launch {
+            settingsRepository.themeMode.collect { mode ->
+                _uiState.update { it.copy(themeMode = mode) }
+            }
+        }
+    }
+
+    fun setThemeMode(mode: ThemeMode) {
+        viewModelScope.launch {
+            settingsRepository.setThemeMode(mode)
+        }
     }
 
     private fun checkCachedApk() {

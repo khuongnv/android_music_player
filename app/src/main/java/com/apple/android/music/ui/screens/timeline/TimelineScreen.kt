@@ -34,8 +34,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.apple.android.music.domain.model.PlaybackActivity
 import com.apple.android.music.ui.theme.AppleRed
-import com.apple.android.music.ui.theme.DarkSurface
-import com.apple.android.music.ui.theme.DarkSurfaceVariant
 import com.apple.android.music.ui.theme.Gray93
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -155,7 +153,7 @@ fun TimelineScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
                         shape = RoundedCornerShape(14.dp),
-                        color = DarkSurface
+                        color = MaterialTheme.colorScheme.surface
                     ) {
                         Box(
                             modifier = Modifier
@@ -203,7 +201,7 @@ private fun TimelineOverviewCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         shape = RoundedCornerShape(16.dp),
-        color = DarkSurface
+        color = MaterialTheme.colorScheme.surface
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             Row(
@@ -255,7 +253,7 @@ private fun TimelineOverviewCard(
             }
 
             Spacer(modifier = Modifier.height(14.dp))
-            HorizontalDivider(thickness = 0.5.dp, color = Color.White.copy(alpha = 0.08f))
+            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(
@@ -313,7 +311,7 @@ private fun InteractiveTimelineBar(
             ) {
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = if (isActiveAtCursor) AppleRed else DarkSurfaceVariant,
+                    color = if (isActiveAtCursor) AppleRed else MaterialTheme.colorScheme.surfaceVariant,
                     shadowElevation = 4.dp,
                     modifier = Modifier.offset {
                         IntOffset(
@@ -337,7 +335,7 @@ private fun InteractiveTimelineBar(
                     .fillMaxWidth()
                     .height(64.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(DarkSurfaceVariant)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
                     .pointerInput(Unit) {
                         detectTapGestures { offset ->
                             val fraction = (offset.x / size.width).coerceIn(0f, 1f)
@@ -362,7 +360,7 @@ private fun InteractiveTimelineBar(
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .width(1.dp)
-                                .background(Color.White.copy(alpha = 0.04f))
+                                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
                         )
                     }
                 }
@@ -404,7 +402,7 @@ private fun InteractiveTimelineBar(
                                 y = 0
                             )
                         }
-                        .background(Color.White)
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
 
                 // Scrubber Knob (Indicator Handle)
@@ -419,7 +417,7 @@ private fun InteractiveTimelineBar(
                         }
                         .shadow(6.dp, CircleShape)
                         .clip(CircleShape)
-                        .background(Color.White),
+                        .background(MaterialTheme.colorScheme.surface),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
@@ -468,7 +466,7 @@ private fun SelectedPointInspectorCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         shape = RoundedCornerShape(16.dp),
-        color = DarkSurface
+        color = MaterialTheme.colorScheme.surface
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             // Header status
@@ -500,7 +498,7 @@ private fun SelectedPointInspectorCard(
             }
 
             Spacer(modifier = Modifier.height(14.dp))
-            HorizontalDivider(thickness = 0.5.dp, color = Color.White.copy(alpha = 0.08f))
+            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
             Spacer(modifier = Modifier.height(14.dp))
 
             if (isActive && activity != null) {
@@ -520,7 +518,7 @@ private fun SelectedPointInspectorCard(
                         modifier = Modifier
                             .size(64.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(DarkSurfaceVariant)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                     )
 
                     Spacer(modifier = Modifier.width(14.dp))
@@ -577,7 +575,7 @@ private fun SelectedPointInspectorCard(
                         .height(6.dp)
                         .clip(RoundedCornerShape(3.dp)),
                     color = AppleRed,
-                    trackColor = DarkSurfaceVariant
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))
@@ -661,7 +659,7 @@ private fun ActivitySessionItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp),
         shape = RoundedCornerShape(12.dp),
-        color = DarkSurface
+        color = MaterialTheme.colorScheme.surface
     ) {
         Row(
             modifier = Modifier
@@ -679,7 +677,7 @@ private fun ActivitySessionItem(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(DarkSurfaceVariant)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             )
 
             Spacer(modifier = Modifier.width(12.dp))

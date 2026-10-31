@@ -8,9 +8,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import coil.Coil
+import com.apple.android.music.domain.model.ThemeMode
 import com.apple.android.music.domain.repository.SettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +38,7 @@ class SettingsRepositoryImpl @Inject constructor(
         val SLEEP_TIMER_ENABLED = booleanPreferencesKey("sleep_timer_enabled")
         val SLEEP_TIMER_DURATION = intPreferencesKey("sleep_timer_duration")
         val SLEEP_TIMER_TARGET_TIME = longPreferencesKey("sleep_timer_target_time")
+        val THEME_MODE = stringPreferencesKey("theme_mode")
     }
 
     override val selectedFolders: Flow<Set<String>> = context.settingsDataStore.data
@@ -161,6 +164,29 @@ class SettingsRepositoryImpl @Inject constructor(
             success = false
         }
         success
+    }
+
+    override val themeMode: Flow<ThemeMode> = context.settingsDataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences ->
+            val raw = preferences[PreferencesKeys.THEME_MODE]
+            try {
+                if (raw != null) ThemeMode.valueOf(raw) else ThemeMode.SYSTEM
+            } catch (e: Exception) {
+                ThemeMode.SYSTEM
+            }
+        }
+
+    override suspend fun setThemeMode(mode: ThemeMode) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[PreferencesKeys.THEME_MODE] = mode.name
+        }
     }
 
     private fun getDirectorySize(dir: File?): Long {

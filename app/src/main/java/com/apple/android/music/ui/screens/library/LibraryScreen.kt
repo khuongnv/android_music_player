@@ -62,8 +62,7 @@ fun LibraryScreen(
                 Triple("Playlists", Icons.AutoMirrored.Filled.QueueMusic, "playlists"),
                 Triple("Artists", Icons.Default.Person, "artists"),
                 Triple("Albums", Icons.Default.Album, "albums"),
-                Triple("Songs", Icons.Default.MusicNote, "songs"),
-                Triple("Hoạt động 24h (Timeline)", Icons.Default.Schedule, "timeline")
+                Triple("Songs", Icons.Default.MusicNote, "songs")
             )
             
             items(menuItems) { (title, icon, route) ->

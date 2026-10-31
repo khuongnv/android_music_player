@@ -25,9 +25,15 @@ import com.apple.android.music.ui.components.MiniPlayer
 import com.apple.android.music.ui.screens.home.HomeViewModel
 import com.apple.android.music.ui.theme.MusicPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import com.apple.android.music.domain.model.ThemeMode
+import com.apple.android.music.domain.repository.SettingsRepository
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -47,7 +53,15 @@ class MainActivity : ComponentActivity() {
 
         try {
             setContent {
-                MusicPlayerTheme {
+                val themeMode by settingsRepository.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+                val isSystemDark = androidx.compose.foundation.isSystemInDarkTheme()
+                val isDarkTheme = when (themeMode) {
+                    ThemeMode.SYSTEM -> isSystemDark
+                    ThemeMode.LIGHT -> false
+                    ThemeMode.DARK -> true
+                }
+
+                MusicPlayerTheme(darkTheme = isDarkTheme) {
                     val navController = rememberNavController()
                     
                     // Check permissions
@@ -94,6 +108,18 @@ class MainActivity : ComponentActivity() {
                             isPlayerExpanded = false
                         }
                         
+                        // Return to Library tab when pressing Back from Timeline or Settings tabs
+                        val isNonLibraryTab = currentRoute == "timeline" || currentRoute == "settings"
+                        androidx.activity.compose.BackHandler(enabled = !isPlayerExpanded && isNonLibraryTab) {
+                            navController.navigate("library") {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+
                         val onNavigateTab: (String) -> Unit = remember(navController) {
                             { route ->
                                 Log.d("MusicApp", "Navigating to $route")

@@ -10,8 +10,9 @@ val SoftGray = Color(0xFFF2F2F7) // Equivalent to iOS .systemGray6
 
 // Light Theme Palette
 val LightBackground = Color(0xFFFFFFFF)
-val LightSurface = Color(0xFFFFFFFF)
-val LightSurfaceVariant = Color(0xFFF2F2F7)
+val LightSurface = Color(0xFFF2F2F7) // iOS .systemGray6 / grouped card surface
+val LightSurfaceVariant = Color(0xFFE5E5EA) // iOS .systemGray5
+
 val LightOnSurface = Color(0xFF000000)
 val LightOnSurfaceVariant = Color(0xFF8E8E93)
 

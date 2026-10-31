@@ -1,5 +1,6 @@
 package com.apple.android.music.domain.repository
 
+import com.apple.android.music.domain.model.ThemeMode
 import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
@@ -19,4 +20,7 @@ interface SettingsRepository {
 
     suspend fun getCacheSizeBytes(): Long
     suspend fun clearCache(): Boolean
+
+    val themeMode: Flow<ThemeMode>
+    suspend fun setThemeMode(mode: ThemeMode)
 }
