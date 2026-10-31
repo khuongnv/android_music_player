@@ -15,8 +15,10 @@ import com.apple.android.music.domain.repository.MusicRepository
 import com.apple.android.music.domain.repository.PlaylistRepository
 import com.apple.android.music.domain.repository.PlayerStateRepository
 import com.apple.android.music.domain.repository.SettingsRepository
+import com.apple.android.music.domain.repository.UpdateRepository
 import com.apple.android.music.data.repository.PlayerStateRepositoryImpl
 import com.apple.android.music.data.repository.SettingsRepositoryImpl
+import com.apple.android.music.data.repository.UpdateRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -95,4 +97,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUpdateRepository(impl: UpdateRepositoryImpl): UpdateRepository
 }
