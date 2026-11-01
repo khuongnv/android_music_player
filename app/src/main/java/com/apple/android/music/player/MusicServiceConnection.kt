@@ -174,11 +174,26 @@ class MusicServiceConnection @Inject constructor(
             controller.seekTo(positionMs)
             controller.play()
         } else {
-            val mediaItem = song.toMediaItem()
-            controller.setMediaItem(mediaItem, positionMs)
-            controller.prepare()
-            controller.play()
+            // Check if this song is already in the current queue
+            val count = controller.mediaItemCount
+            var existingIndex = -1
+            for (i in 0 until count) {
+                if (controller.getMediaItemAt(i).mediaId == song.id.toString()) {
+                    existingIndex = i
+                    break
+                }
+            }
+            if (existingIndex != -1) {
+                controller.seekTo(existingIndex, positionMs)
+                controller.play()
+            } else {
+                val mediaItem = song.toMediaItem()
+                controller.setMediaItem(mediaItem, positionMs)
+                controller.prepare()
+                controller.play()
+            }
         }
+        _currentSong.value = song
         _currentPosition.value = positionMs
     }
 

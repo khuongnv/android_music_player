@@ -12,6 +12,11 @@ fun Song.toMediaItem(): MediaItem {
     return MediaItem.Builder()
         .setMediaId(id.toString())
         .setUri(uri)
+        .setRequestMetadata(
+            MediaItem.RequestMetadata.Builder()
+                .setMediaUri(uri)
+                .build()
+        )
         .setMediaMetadata(
             MediaMetadata.Builder()
                 .setTitle(title)
@@ -32,7 +37,7 @@ fun MediaItem.toSong(duration: Long = 0L): Song? {
             artist = metadata.artist?.toString() ?: "Unknown Artist",
             album = metadata.albumTitle?.toString() ?: "Unknown Album",
             duration = duration,
-            uri = localConfiguration?.uri ?: Uri.EMPTY,
+            uri = localConfiguration?.uri ?: requestMetadata.mediaUri ?: Uri.EMPTY,
             albumId = 0L,
             albumArtUri = metadata.artworkUri
         )

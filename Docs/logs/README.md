@@ -8,6 +8,7 @@ Thư mục này lưu trữ toàn bộ nhật ký chi tiết về các bước th
 
 | Ngày | Tên Tệp Log | Nhiệm Vụ / Tính Năng | Agent Phụ Trách | Trạng Thái |
 | :--- | :--- | :--- | :--- | :--- |
+| 2026-11-01 | [`2026-11-01_fix_timeline_playback_and_release_v1.2.7.md`](./2026-11-01_fix_timeline_playback_and_release_v1.2.7.md) | Khắc phục lỗi phát nhạc tại thời điểm cũ trong màn hình Ký ức (Timeline) & Phát hành v1.2.7 | `media-playback-specialist`, `compose-ui-specialist`, `lead-architect` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_release_v1.2.6.md`](./2026-10-31_release_v1.2.6.md) | Phát hành phiên bản v1.2.6 (Tinh chỉnh Cài đặt & Tối ưu dự án) | `lead-architect`, `qa-perf-specialist` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_remove_redundant_apple_music_offline_row_in_settings.md`](./2026-10-31_remove_redundant_apple_music_offline_row_in_settings.md) | Loại bỏ dòng thông tin trùng lặp "Apple Music (Offline)" trong màn hình Cài đặt | `compose-ui-specialist`, `lead-architect` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_migrate_media_downloader_to_standalone_project.md`](./2026-10-31_migrate_media_downloader_to_standalone_project.md) | Chuyển giao & Tách toàn bộ việc download nhạc sang repository độc lập `download-ytb-mp3` | `lead-architect`, `storage-data-specialist` | ✅ Hoàn thành |

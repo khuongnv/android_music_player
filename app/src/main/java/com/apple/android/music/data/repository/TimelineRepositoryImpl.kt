@@ -48,6 +48,8 @@ class TimelineRepositoryImpl @Inject constructor(
         currentPosition: Long,
         timestamp: Long
     ) = withContext(Dispatchers.IO) {
+        val actualSong = songDao.getSongById(songId)
+        val validSongUri = if (songUri.isNotBlank()) songUri else (actualSong?.path ?: "")
         val latest = playbackActivityDao.getLatestActivity()
         
         if (latest != null && 
@@ -57,7 +59,8 @@ class TimelineRepositoryImpl @Inject constructor(
             // Extend existing activity segment
             val updated = latest.copy(
                 endTime = timestamp,
-                endPosition = currentPosition.coerceAtLeast(latest.startPosition)
+                endPosition = currentPosition.coerceAtLeast(latest.startPosition),
+                songUri = if (latest.songUri.isNotBlank()) latest.songUri else validSongUri
             )
             playbackActivityDao.update(updated)
         } else {
@@ -68,7 +71,7 @@ class TimelineRepositoryImpl @Inject constructor(
                 artistName = artistName,
                 albumName = albumName,
                 artworkUri = artworkUri,
-                songUri = songUri,
+                songUri = validSongUri,
                 songDuration = songDuration,
                 startPosition = currentPosition,
                 endPosition = currentPosition,
@@ -88,11 +91,30 @@ class TimelineRepositoryImpl @Inject constructor(
     }
 
     override suspend fun ensureSampleActivitiesIfEmpty() = withContext(Dispatchers.IO) {
-        val count = playbackActivityDao.getActivityCount()
-        if (count > 0) return@withContext
-
         val allSongs = songDao.getAllSongs().first()
         if (allSongs.isEmpty()) return@withContext
+
+        val count = playbackActivityDao.getActivityCount()
+        if (count > 0) {
+            // Repair any records in database with blank songUri
+            val recent = playbackActivityDao.getActivitiesSince(System.currentTimeMillis() - TWENTY_FOUR_HOURS_MS)
+            for (act in recent) {
+                if (act.songUri.isBlank()) {
+                    val matching = songDao.getSongById(act.songId)
+                        ?: allSongs.firstOrNull { it.title.equals(act.songTitle, ignoreCase = true) }
+                    if (matching != null && matching.path.isNotBlank()) {
+                        playbackActivityDao.update(
+                            act.copy(
+                                songId = matching.id,
+                                songUri = matching.path,
+                                artworkUri = matching.artworkUri ?: act.artworkUri
+                            )
+                        )
+                    }
+                }
+            }
+            return@withContext
+        }
 
         val now = System.currentTimeMillis()
 
@@ -178,7 +200,7 @@ class TimelineRepositoryImpl @Inject constructor(
             artistName = artistName,
             albumName = albumName,
             artworkUri = artworkUri?.let { Uri.parse(it) },
-            songUri = Uri.parse(songUri),
+            songUri = if (songUri.isNotBlank()) Uri.parse(songUri) else Uri.EMPTY,
             songDuration = songDuration,
             startPosition = startPosition,
             endPosition = endPosition,

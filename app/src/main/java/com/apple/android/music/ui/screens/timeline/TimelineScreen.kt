@@ -661,6 +661,7 @@ private fun ActivitySessionItem(
     val durationMinutes = (activity.activeDurationMs / 60000L).coerceAtLeast(1L)
 
     Surface(
+        onClick = onPlayClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp),

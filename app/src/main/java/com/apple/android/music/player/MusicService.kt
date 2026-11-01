@@ -125,16 +125,27 @@ class MusicService : MediaSessionService() {
         val artist = currentMediaItem.mediaMetadata.artist?.toString() ?: "Unknown Artist"
         val album = currentMediaItem.mediaMetadata.albumTitle?.toString() ?: "Unknown Album"
         val artworkUri = currentMediaItem.mediaMetadata.artworkUri?.toString()
-        val songUri = currentMediaItem.requestMetadata.mediaUri?.toString() ?: ""
-        val duration = if (currentPlayer.duration != C.TIME_UNSET) currentPlayer.duration else 0L
+        
+        // Ensure valid audio URI from repository, localConfiguration, or requestMetadata
+        val realSong = musicRepository.getSongById(songId)
+        val songUri = realSong?.uri?.toString()
+            ?: currentMediaItem.localConfiguration?.uri?.toString()
+            ?: currentMediaItem.requestMetadata.mediaUri?.toString()
+            ?: ""
+
+        val duration = if (currentPlayer.duration != C.TIME_UNSET && currentPlayer.duration > 0L) {
+            currentPlayer.duration
+        } else {
+            realSong?.duration ?: 0L
+        }
         val position = currentPlayer.currentPosition.coerceAtLeast(0L)
 
         timelineRepository.recordActivity(
             songId = songId,
-            songTitle = title,
-            artistName = artist,
-            albumName = album,
-            artworkUri = artworkUri,
+            songTitle = realSong?.title ?: title,
+            artistName = realSong?.artist ?: artist,
+            albumName = realSong?.album ?: album,
+            artworkUri = realSong?.albumArtUri?.toString() ?: artworkUri,
             songUri = songUri,
             songDuration = duration,
             currentPosition = position
@@ -284,6 +295,36 @@ class MusicService : MediaSessionService() {
     }
 
     private inner class CustomMediaSessionCallback : MediaSession.Callback {
+        override fun onAddMediaItems(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            mediaItems: MutableList<MediaItem>
+        ): com.google.common.util.concurrent.ListenableFuture<MutableList<MediaItem>> {
+            val resolvedItems = mediaItems.map { item ->
+                if (item.localConfiguration == null) {
+                    val resolvedUri = item.requestMetadata.mediaUri
+                        ?: item.mediaId.toLongOrNull()?.let { id ->
+                            kotlinx.coroutines.runBlocking { musicRepository.getSongById(id)?.uri }
+                        }
+                    if (resolvedUri != null) {
+                        item.buildUpon()
+                            .setUri(resolvedUri)
+                            .setRequestMetadata(
+                                item.requestMetadata.buildUpon()
+                                    .setMediaUri(resolvedUri)
+                                    .build()
+                            )
+                            .build()
+                    } else {
+                        item
+                    }
+                } else {
+                    item
+                }
+            }.toMutableList()
+            return com.google.common.util.concurrent.Futures.immediateFuture(resolvedItems)
+        }
+
         override fun onCustomCommand(
             session: MediaSession,
             controller: MediaSession.ControllerInfo,
