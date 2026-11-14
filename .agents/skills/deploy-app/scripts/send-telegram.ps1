@@ -82,7 +82,7 @@ try {
         $content.Add((New-Object System.Net.Http.StringContent($ParseMode)), "parse_mode")
         
         $fileBytes = [System.IO.File]::ReadAllBytes($PhotoPath)
-        $fileContent = New-Object System.Net.Http.ByteArrayContent($fileBytes)
+        $fileContent = New-Object System.Net.Http.ByteArrayContent (,$fileBytes)
         $fileContent.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::Parse("image/png")
         $content.Add($fileContent, "photo", [System.IO.Path]::GetFileName($PhotoPath))
         

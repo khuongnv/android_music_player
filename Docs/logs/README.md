@@ -8,7 +8,7 @@ Thư mục này lưu trữ toàn bộ nhật ký chi tiết về các bước th
 
 | Ngày | Tên Tệp Log | Nhiệm Vụ / Tính Năng | Agent Phụ Trách | Trạng Thái |
 | :--- | :--- | :--- | :--- | :--- |
-| 2026-11-15 | [`2026-11-15_implement_ios_and_deploy.md`](./2026-11-15_implement_ios_and_deploy.md) | Trien khai toan dien ung dung iOS SwiftUI va thuc thi deploy phat hanh Enterprise In-House | `lead-architect` | 🔄 Đang tiến hành |
+| 2026-11-15 | [`2026-11-15_implement_ios_and_deploy.md`](./2026-11-15_implement_ios_and_deploy.md) | Triển khai toàn diện ứng dụng iOS SwiftUI và thực thi deploy phát hành Enterprise In-House v1.0.0 | Tất cả Swarm Agents | ✅ Hoàn thành |
 | 2026-11-15 | [`2026-11-15_setup_ios_deploy_and_ota_update.md`](./2026-11-15_setup_ios_deploy_and_ota_update.md) | Xây dựng deploy-app cho iOS Enterprise và giải pháp OTA App Update dựa trên `mdm-parental-control` | `lead-architect` | ✅ Hoàn thành |
 | 2026-11-15 | [`2026-11-15_update_ios_epics_with_enterprise_signing.md`](./2026-11-15_update_ios_epics_with_enterprise_signing.md) | Điều chỉnh Epic và cấu hình iOS khớp với BundleId `com.dhtthni.dhxe` và Enterprise Team VNPT | `lead-architect` | ✅ Hoàn thành |
 | 2026-11-14 | [`2026-11-14_restructure_monorepo_and_swiftui_epics.md`](./2026-11-14_restructure_monorepo_and_swiftui_epics.md) | Tái cấu trúc Monorepo (`android/` & `ios/`), khởi tạo dự án SwiftUI và biên soạn Epics cho iOS | `lead-architect` | ✅ Hoàn thành |
