@@ -1,4 +1,4 @@
-param(
+﻿param(
     [Parameter(Mandatory = $false)]
     [string]$Message,
 
@@ -42,10 +42,10 @@ $nowStr = (Get-Date).ToString("HH:mm:ss dd/MM/yyyy")
 
 $finalMsg = ""
 if (-not [string]::IsNullOrWhiteSpace($StepTitle)) {
-    $isComplete = ($ResultStatus -match "Thành công|HOÀN TẤT|Hoàn tất|Thanh cong|HOAN TAT|Success") -or ($StepTitle -match "THÀNH CÔNG|HOÀN TẤT|TỔNG KẾT|Tong ket")
-    $statusIcon = if ($isComplete) { $iconRocket } elseif ($ResultStatus -match "Đang|Chờ|Tiến hành|Dang|Cho|Tien hanh") { $iconWait } else { $iconWarn }
+    $isComplete = ($ResultStatus -match "Thanh cong|HOAN TAT|Hoan tat|Success|Complete|Done") -or ($StepTitle -match "THANH CONG|HOAN TAT|TONG KET|Complete|Success")
+    $statusIcon = if ($isComplete) { $iconRocket } elseif ($ResultStatus -match "Dang|Cho|Tien hanh|Progress|Wait") { $iconWait } else { $iconWarn }
     
-    if ($isComplete -and ($StepTitle -match "TỔNG KẾT|THÀNH CÔNG|HOÀN TẤT")) {
+    if ($isComplete -and ($StepTitle -match "TONG KET|THANH CONG|HOAN TAT|Complete")) {
         $finalMsg = "$statusIcon <b>[MUSIC PLAYER CI/CD] $StepTitle</b>`n`n"
         if (-not [string]::IsNullOrWhiteSpace($Message)) {
             $finalMsg += "$Message`n`n"

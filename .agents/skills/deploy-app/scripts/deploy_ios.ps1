@@ -97,9 +97,10 @@ Send-TgStep -Title $step1Title -Message $step1Desc -Status "Đang khởi tạo c
 
 # Cập nhật Info.plist
 if (Test-Path $infoPlistPath) {
-    $plistContent = Get-Content -Path $infoPlistPath -Raw -Encoding UTF8
+    $plistContent = [System.IO.File]::ReadAllText($infoPlistPath, [System.Text.Encoding]::UTF8)
     $plistContent = $plistContent -replace "<key>CFBundleShortVersionString<\/key>\s*<string>[^<]+<\/string>", "<key>CFBundleShortVersionString</key>`n    <string>$Version</string>"
-    Set-Content -Path $infoPlistPath -Value $plistContent -Encoding UTF8 -NoNewline
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($infoPlistPath, $plistContent, $utf8NoBom)
 }
 
 $releaseDir = Join-Path $repoRoot "releases"
@@ -176,62 +177,18 @@ tar -xzf ios_src.tar.gz
 
     # ---------------- BƯỚC 4: BIÊN DỊCH RELEASE IPA ----------------
     $step4Title = "Bước 4: Biên dịch Gói cài đặt iOS Release (.ipa)"
-    $step4Desc = "Chạy xcodebuild archive & exportArchive Enterprise"
+    $step4Desc = "Chạy biên dịch Swift arm64 và ký số Enterprise VNPT trên Mac M1 Pro"
     Write-Host ">>> $step4Title..." -ForegroundColor Yellow
-    Send-TgStep -Title $step4Title -Message $step4Desc -Status "Đang chạy xcodebuild archive trên Mac M1 Pro..."
+    Send-TgStep -Title $step4Title -Message $step4Desc -Status "Đang chạy build_mac.sh trên Mac M1 Pro..."
 
-    $buildCmds = @"
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:`$PATH"
-cd ~/musicplayer-build/ios
-security unlock-keychain -p "1230" ~/Library/Keychains/login.keychain-db 2>/dev/null || true
-security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "1230" ~/Library/Keychains/login.keychain-db 2>/dev/null || true
-
-rm -rf build
-mkdir -p build/archive build/ipa
-
-echo "=== BIÊN DỊCH & KÝ SỐ ENTERPRISE ==="
-mkdir -p build/ipa/Payload/MusicPlayer.app
-
-echo "1. Biên dịch mã nguồn Swift sang arm64 iPhoneOS..."
-SWIFT_FILES=$(find MusicPlayer -name "*.swift")
-xcrun --sdk iphoneos swiftc \
-  -target arm64-apple-ios16.0 \
-  -O \
-  -parse-as-library \
-  $SWIFT_FILES \
-  -o build/ipa/Payload/MusicPlayer.app/MusicPlayer
-
-echo "2. Đóng gói Info.plist & embedded.mobileprovision..."
-cp MusicPlayer/Resources/Info.plist build/ipa/Payload/MusicPlayer.app/Info.plist
-plutil -replace CFBundleExecutable -string "MusicPlayer" build/ipa/Payload/MusicPlayer.app/Info.plist
-plutil -replace CFBundleIdentifier -string "$bundleId" build/ipa/Payload/MusicPlayer.app/Info.plist
-
-cp ~/musicplayer-build/certs/$profileUuid.mobileprovision build/ipa/Payload/MusicPlayer.app/embedded.mobileprovision
-
-echo "3. Trích xuất Entitlements & Ký số Enterprise..."
-security cms -D -i build/ipa/Payload/MusicPlayer.app/embedded.mobileprovision | plutil -extract Entitlements xml1 -o build/entitlements.plist -
-
-codesign --force \
-  --sign "55EC3964ACBC2DCA8D9C621C07EFA94AF764600F" \
-  --entitlements build/entitlements.plist \
-  --timestamp=none \
-  --generate-entitlement-der \
-  build/ipa/Payload/MusicPlayer.app
-
-echo "4. Đóng gói file IPA..."
-cd build/ipa
-zip -qr MusicPlayer.ipa Payload
-cd ../..
-
-echo "=== DANH SÁCH IPA ==="
-ls -lh build/ipa/*.ipa
-shasum -a 256 build/ipa/*.ipa
-"@
-    $buildResult = ssh -o StrictHostKeyChecking=no "$MacUser@$MacHost" $buildCmds
+    $buildResult = ssh -o StrictHostKeyChecking=no "$MacUser@$MacHost" "bash ~/musicplayer-build/ios/build_mac.sh"
     Write-Host $buildResult
+    if ($LASTEXITCODE -ne 0) {
+        throw "Biên dịch trên Mac M1 Pro thất bại!"
+    }
 
     # Tải file IPA về host
-    scp -o StrictHostKeyChecking=no "${MacUser}@${MacHost}:~/musicplayer-build/ios/build/ipa/*.ipa" "$destIpa"
+    scp -o StrictHostKeyChecking=no "${MacUser}@${MacHost}:~/musicplayer-build/ios/build/ipa/MusicPlayer.ipa" "$destIpa"
 } else {
     Write-Host ">>> SkipBuild: Bỏ qua bước build từ xa, sử dụng IPA có sẵn hoặc tạo stub..." -ForegroundColor Yellow
     if (-not (Test-Path $destIpa)) {
@@ -268,12 +225,13 @@ $manifestContent = $manifestContent -replace '\{\{IPA_URL\}\}', $ipaDownloadUrl
 $manifestContent = $manifestContent -replace '\{\{BUNDLE_ID\}\}', $bundleId
 $manifestContent = $manifestContent -replace '\{\{VERSION\}\}', $Version
 $manifestContent = $manifestContent -replace '\{\{TITLE\}\}', "Music Player"
-Set-Content -Path $manifestDestPath -Value $manifestContent -Encoding UTF8
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText($manifestDestPath, $manifestContent, $utf8NoBom)
 
 # Tạo Git Tag
 $gitStatus = git status --porcelain
 if ($gitStatus) {
-    git add ios/ Docs/
+    git add -A
     git commit -m "chore(release): bump ios version to $Version"
     git push origin main
 }

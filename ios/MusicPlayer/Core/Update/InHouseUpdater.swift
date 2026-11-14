@@ -23,7 +23,7 @@ public class InHouseUpdater: ObservableObject {
     public static let shared = InHouseUpdater()
     
     public var repoOwner: String = "khuongnv"
-    public var repoName: String = "android-music-player"
+    public var repoName: String = "android_music_player"
     
     @Published public private(set) var isChecking: Bool = false
     @Published public private(set) var availableUpdate: GitHubReleaseInfo?
