@@ -1,10 +1,23 @@
-# Android Offline Music Player
+# Offline Music Player (Android & iOS)
 
-A premium, high-performance offline music player for Android, heavily inspired by the clean and elegant aesthetics of Apple Music. This application is designed to provide a seamless listening experience for your locally stored music files, with a focus on visual excellence and smooth interactions.
+A premium, high-performance offline music player for Android and iOS, heavily inspired by the clean and elegant aesthetics of Apple Music and Liquid Glass materials. This repository is structured as a dual-native workspace containing both the complete **Android** application (Kotlin, Jetpack Compose, Media3) and the **iOS** application (Swift, SwiftUI, AVFoundation).
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Platform](https://img.shields.io/badge/platform-Android-green.svg)
-![Kotlin](https://img.shields.io/badge/language-Kotlin-purple.svg)
+![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-green.svg)
+![Languages](https://img.shields.io/badge/languages-Kotlin%20%7C%20Swift-purple.svg)
+
+## 📁 Repository Structure
+
+```text
+├── android/                   # Android Native App (Kotlin, Jetpack Compose, Media3)
+│   ├── app/                   # Android source code & resources
+│   ├── gradle/                # Gradle wrapper
+│   ├── build.gradle.kts       # Root build configuration
+│   └── settings.gradle.kts    # Gradle settings
+├── ios/                       # iOS Native App (Swift, SwiftUI, AVFoundation)
+│   └── MusicPlayer/           # SwiftUI app source code & resources
+└── Docs/                      # Architecture, UI/UX Style Guide, Logs & Epics
+```
 
 ## 📱 Project Overview
 

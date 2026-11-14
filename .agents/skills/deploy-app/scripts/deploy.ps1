@@ -1,17 +1,48 @@
 ﻿param (
+    [Parameter(Mandatory=$false)]
+    [ValidateSet("android", "ios", "all")]
+    [string]$Platform = "android",
+
+    [Parameter(Mandatory=$false)]
     [ValidateSet("patch", "minor", "major", "custom")]
     [string]$BumpType = "patch",
 
+    [Parameter(Mandatory=$false)]
     [string]$CustomVersion = "",
+
+    [Parameter(Mandatory=$false)]
     [string]$ReleaseTitle = "",
+
+    [Parameter(Mandatory=$false)]
     [string]$ReleaseNotes = "",
+
     [switch]$DryRun,
     [switch]$SkipPush,
     [switch]$SkipTest
 )
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..\..")).Path
-$buildGradlePath = Join-Path -Path $repoRoot -ChildPath "app\build.gradle.kts"
+
+# 0. Điều phối theo nền tảng
+if ($Platform -eq "ios") {
+    $deployIosScript = Join-Path $PSScriptRoot "deploy_ios.ps1"
+    $iosParams = @{}
+    if (-not [string]::IsNullOrWhiteSpace($CustomVersion)) { $iosParams["Version"] = $CustomVersion }
+    if (-not [string]::IsNullOrWhiteSpace($ReleaseNotes)) { $iosParams["Notes"] = $ReleaseNotes }
+    & $deployIosScript @iosParams
+    exit $LASTEXITCODE
+}
+
+if ($Platform -eq "all") {
+    Write-Host ">>> PHÁT HÀNH ĐỒNG THỜI CẢ ANDROID VÀ iOS <<<" -ForegroundColor Magenta
+    & $MyInvocation.MyCommand.Path -Platform android -BumpType $BumpType -CustomVersion $CustomVersion -ReleaseNotes $ReleaseNotes
+    & $MyInvocation.MyCommand.Path -Platform ios -CustomVersion $CustomVersion -ReleaseNotes $ReleaseNotes
+    exit 0
+}
+$buildGradlePath = Join-Path -Path $repoRoot -ChildPath "android\app\build.gradle.kts"
+if (-not (Test-Path $buildGradlePath)) {
+    $buildGradlePath = Join-Path -Path $repoRoot -ChildPath "app\build.gradle.kts"
+}
 
 if (-not (Test-Path $buildGradlePath)) {
     Write-Error "Không tìm thấy app/build.gradle.kts tại: $buildGradlePath"
@@ -77,7 +108,10 @@ Write-Host "Git Tag phát hành  : $tag" -ForegroundColor Green
 # 3. Kiểm tra kiểm thử / biên dịch trước khi deploy
 if (-not $SkipTest) {
     Write-Host "`n[1/5] Đang kiểm tra biên dịch (compileDebugKotlin)..." -ForegroundColor Yellow
-    $gradlewBat = Join-Path -Path $repoRoot -ChildPath "gradlew.bat"
+    $gradlewBat = Join-Path -Path $repoRoot -ChildPath "android\gradlew.bat"
+    if (-not (Test-Path $gradlewBat)) {
+        $gradlewBat = Join-Path -Path $repoRoot -ChildPath "gradlew.bat"
+    }
     if (Test-Path $gradlewBat) {
         & $gradlewBat compileDebugKotlin
         if ($LASTEXITCODE -ne 0) {

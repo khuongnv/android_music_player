@@ -23,17 +23,19 @@ jobs:
           cache: gradle
 
       - name: Grant execute permission for gradlew
+        working-directory: android
         run: chmod +x gradlew
 
       - name: Build Android Release APK
+        working-directory: android
         run: ./gradlew assembleRelease --stacktrace
 
       - name: Locate APK
         id: find_apk
         run: |
-          APK_PATH=$(find app/build/outputs/apk/release/ -name "app-release.apk" | head -n 1)
+          APK_PATH=$(find android/app/build/outputs/apk/release/ -name "app-release.apk" | head -n 1)
           if [ -z "$APK_PATH" ]; then
-            APK_PATH=$(find app/build/outputs/apk/ -name "*.apk" ! -name "*unsigned*" | head -n 1)
+            APK_PATH=$(find android/app/build/outputs/apk/ -name "*.apk" ! -name "*unsigned*" | head -n 1)
           fi
           if [ -z "$APK_PATH" ]; then
             echo "Error: No signed APK found!"

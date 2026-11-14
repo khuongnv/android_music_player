@@ -1,53 +1,45 @@
 ---
 name: deploy-app
 description: >-
-  Deploys and releases a new version of the Android Offline Music Player.
+  Deploys and releases new versions of the Offline Music Player for Android (APK) and iOS (Enterprise IPA).
   Use this skill whenever the user asks to release, deploy, publish, or bump the app version,
-  create a new Git release tag, or generate release notes for GitHub Releases.
+  create a new Git release tag, build iOS IPA with VNPT Enterprise signing, generate Apple OTA manifests, or produce GitHub Releases.
 ---
 
-# 🚀 Deploy App Skill - Quy Trình Phát Hành Phiên Bản Mới
+# 🚀 Deploy App Skill - Quy Trình Phát Hành Đa Nền Tảng (Android & iOS Enterprise)
 
-Skill này cung cấp quy trình tự động hóa toàn diện từ chuẩn bị, kiểm thử, nâng phiên bản (Semantic Versioning), sinh Release Notes chi tiết và đẩy Git Tag lên GitHub để kích hoạt CI/CD tự động xuất bản APK cho tính năng Auto-Update.
+Skill này cung cấp quy trình tự động hóa toàn diện từ chuẩn bị, kiểm thử, nâng phiên bản (Semantic Versioning), sinh Release Notes, đóng gói APK (Android) hoặc IPA ký số VNPT Enterprise (iOS), sinh file Apple OTA Manifest (`manifest.plist`), tạo mã QR Code cài đặt và phát hành lên GitHub Releases kèm giám sát Telegram HUB-LOG.
 
 ---
 
-## ⚡ Quy Trình 5 Bước Phát Hành Chuẩn
+## 🏷️ 1. Quy Chuẩn Phân Biệt Ứng Dụng Trên GitHub Releases
 
-```mermaid
-flowchart TD
-    S1[1. Pre-flight Check: Git Status & Build Test] --> S2[2. Xác Định Version Mới SemVer]
-    S2 --> S3[3. Tự Động Sinh Release Notes & Bump Version]
-    S3 --> S4[4. Tạo Git Commit, Annotated Tag & Push]
-    S4 --> S5[5. Kích Hoạt CI/CD & Ghi Nhật Ký Docs/logs/]
+| Nền tảng | Thư mục | Git Tag Định Danh | Tệp Đính Kèm (Release Assets) | Cơ Chế Nâng Cấp Client |
+| :--- | :--- | :--- | :--- | :--- |
+| **Android** | `android/` | `vX.Y.Z` (hoặc `android-vX.Y.Z`) | `app-release.apk` | Tải APK & PackageInstaller |
+| **iOS Enterprise** | `ios/` | `ios-vX.Y.Z` | `MusicPlayer-ios-X.Y.Z.ipa`<br>`manifest.plist`<br>`MusicPlayer-ios-X.Y.Z-qr.png` | Apple OTA: `itms-services://?action=download-manifest&url=...` |
+
+---
+
+## ⚡ 2. Hướng Dẫn Sử Dụng Lệnh Triển Khai (`deploy.ps1`)
+
+Kịch bản điều phối trung tâm: `.agents/skills/deploy-app/scripts/deploy.ps1`
+
+### 1. Phát hành cho Android:
+```powershell
+powershell -ExecutionPolicy Bypass -File .agents/skills/deploy-app/scripts/deploy.ps1 -Platform android -BumpType patch
 ```
 
----
-
-### Bước 1: Kiểm Tra Trước Phát Hành (Pre-flight Checks)
-1. Đảm bảo toàn bộ thay đổi mã nguồn trước đó đã được hoàn thiện.
-2. Kiểm tra biên dịch bằng lệnh:
-   ```powershell
-   .\gradlew.bat compileDebugKotlin
-   ```
-   *(Đảm bảo kết quả BUILD SUCCESSFUL trước khi tiến hành bước tiếp theo).*
-
----
-
-### Bước 2: BẮT BUỘC - Khởi Tạo Log Truy Vết (`Docs/logs/`)
-Trước khi thực hiện release, tạo bản ghi nhật ký:
+### 2. Phát hành cho iOS Enterprise (Ký số VNPT qua Mac M1 Pro):
 ```powershell
-powershell -ExecutionPolicy Bypass -File .agents/skills/swarm-dispatch/scripts/init_log.ps1 -TaskSlug "release_v<version>" -TaskTitle "Phát hành phiên bản ứng dụng v<version>" -AgentName "lead-architect"
+powershell -ExecutionPolicy Bypass -File .agents/skills/deploy-app/scripts/deploy.ps1 -Platform ios -CustomVersion "1.0.0" -ReleaseNotes "Bản phát hành iOS Enterprise đầu tiên cho Music Player."
 ```
+> Tự động nạp chứng chỉ VNPT Enterprise (`docs/dev-ios/`), sync source code, chạy `xcodebuild archive`, xuất `.ipa`, sinh file `manifest.plist` cho Apple OTA, tạo mã QR Code và đẩy GitHub Release `ios-v1.0.0`.
 
----
-
-### Bước 3: Thực Hiện Deploy Bằng Script Tự Động (`scripts/deploy.ps1`)
-
-Sử dụng script tiện ích tự động hóa các thao tác cập nhật `app/build.gradle.kts`, sinh Release Notes, commit, tạo tag và đẩy lên GitHub:
-
-#### 1. Phát hành bản vá lỗi (Patch: 1.0.0 -> 1.0.1)
+### 3. Phát hành đồng thời cả hai nền tảng:
 ```powershell
+powershell -ExecutionPolicy Bypass -File .agents/skills/deploy-app/scripts/deploy.ps1 -Platform all -CustomVersion "1.1.0"
+```
 powershell -ExecutionPolicy Bypass -File .agents/skills/deploy-app/scripts/deploy.ps1 -BumpType patch -ReleaseTitle "Vá lỗi và cải thiện độ ổn định"
 ```
 

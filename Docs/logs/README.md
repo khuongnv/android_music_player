@@ -8,6 +8,11 @@ Thư mục này lưu trữ toàn bộ nhật ký chi tiết về các bước th
 
 | Ngày | Tên Tệp Log | Nhiệm Vụ / Tính Năng | Agent Phụ Trách | Trạng Thái |
 | :--- | :--- | :--- | :--- | :--- |
+| 2026-11-15 | [`2026-11-15_implement_ios_and_deploy.md`](./2026-11-15_implement_ios_and_deploy.md) | Trien khai toan dien ung dung iOS SwiftUI va thuc thi deploy phat hanh Enterprise In-House | `lead-architect` | 🔄 Đang tiến hành |
+| 2026-11-15 | [`2026-11-15_setup_ios_deploy_and_ota_update.md`](./2026-11-15_setup_ios_deploy_and_ota_update.md) | Xây dựng deploy-app cho iOS Enterprise và giải pháp OTA App Update dựa trên `mdm-parental-control` | `lead-architect` | ✅ Hoàn thành |
+| 2026-11-15 | [`2026-11-15_update_ios_epics_with_enterprise_signing.md`](./2026-11-15_update_ios_epics_with_enterprise_signing.md) | Điều chỉnh Epic và cấu hình iOS khớp với BundleId `com.dhtthni.dhxe` và Enterprise Team VNPT | `lead-architect` | ✅ Hoàn thành |
+| 2026-11-14 | [`2026-11-14_restructure_monorepo_and_swiftui_epics.md`](./2026-11-14_restructure_monorepo_and_swiftui_epics.md) | Tái cấu trúc Monorepo (`android/` & `ios/`), khởi tạo dự án SwiftUI và biên soạn Epics cho iOS | `lead-architect` | ✅ Hoàn thành |
+| 2026-11-14 | [`2026-11-14_flutter_cross_platform_migration_epics.md`](./2026-11-14_flutter_cross_platform_migration_epics.md) | Xây dựng Epics chuyển đổi sang Flutter hỗ trợ iOS & Android kèm khuyến cáo kiến trúc | `lead-architect` | ✅ Hoàn thành |
 | 2026-11-02 | [`2026-11-02_create_ui_ux_design_standards_guide.md`](./2026-11-02_create_ui_ux_design_standards_guide.md) | Biên soạn tài liệu tiêu chuẩn UI/UX học tập phong cách Apple Music x Liquid Glass | `compose-ui-specialist`, `lead-architect` | ✅ Hoàn thành |
 | 2026-11-01 | [`2026-11-01_fix_timeline_playback_and_release_v1.2.7.md`](./2026-11-01_fix_timeline_playback_and_release_v1.2.7.md) | Khắc phục lỗi phát nhạc tại thời điểm cũ trong màn hình Ký ức (Timeline) & Phát hành v1.2.7 | `media-playback-specialist`, `compose-ui-specialist`, `lead-architect` | ✅ Hoàn thành |
 | 2026-10-31 | [`2026-10-31_release_v1.2.6.md`](./2026-10-31_release_v1.2.6.md) | Phát hành phiên bản v1.2.6 (Tinh chỉnh Cài đặt & Tối ưu dự án) | `lead-architect`, `qa-perf-specialist` | ✅ Hoàn thành |
