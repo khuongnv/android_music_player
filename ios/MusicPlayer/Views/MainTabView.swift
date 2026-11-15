@@ -77,7 +77,7 @@ public struct MainTabView: View {
                 .padding(.bottom, 6)
             }
         }
-        .fullScreenCover(isPresented: $showNowPlayingSheet) {
+        .sheet(isPresented: $showNowPlayingSheet) {
             NowPlayingView()
         }
     }

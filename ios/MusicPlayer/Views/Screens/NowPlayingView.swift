@@ -8,18 +8,44 @@ public struct NowPlayingView: View {
     
     public var body: some View {
         ZStack {
-            // AMOLED Black Background
-            ColorTokens.amoledBlack.ignoresSafeArea()
+            // Dynamic Blurred Artwork Background
+            if let song = playerService.currentSong,
+               let artURL = song.artworkURL,
+               let img = UIImage(contentsOfFile: artURL.path) {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+                    .blur(radius: 60)
+                    .overlay(Color.black.opacity(0.68))
+            } else {
+                ColorTokens.amoledBlack.ignoresSafeArea()
+            }
             
             VStack(spacing: 20) {
-                // Top Grabber & Dismiss Bar
-                Capsule()
-                    .fill(Color.white.opacity(0.3))
-                    .frame(width: 36, height: 5)
-                    .padding(.top, 12)
-                
-                HStack {
+                // Top Header: Dismiss Button (Chevron Down), Grabber & Sleep Timer
+                HStack(alignment: .center) {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundColor(ColorTokens.textPrimary)
+                            .frame(width: 38, height: 38)
+                            .background(Color.white.opacity(0.12))
+                            .clipShape(Circle())
+                    }
+                    
                     Spacer()
+                    
+                    Capsule()
+                        .fill(Color.white.opacity(0.35))
+                        .frame(width: 40, height: 5)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            dismiss()
+                        }
+                    
+                    Spacer()
+                    
                     // Sleep Timer Quick Button
                     Button(action: { showingSleepTimerSheet = true }) {
                         HStack(spacing: 4) {
@@ -31,29 +57,29 @@ public struct NowPlayingView: View {
                         }
                         .font(.system(size: 14))
                         .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(sleepTimer.isActive ? ColorTokens.primaryAccent : ColorTokens.darkSurface)
-                        .foregroundColor(sleepTimer.isActive ? .white : ColorTokens.textSecondary)
+                        .padding(.vertical, 7)
+                        .background(sleepTimer.isActive ? ColorTokens.primaryAccent : Color.white.opacity(0.12))
+                        .foregroundColor(sleepTimer.isActive ? .white : ColorTokens.textPrimary)
                         .cornerRadius(14)
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 20)
+                .padding(.top, 14)
                 
                 Spacer()
                 
                 // Big Album Artwork with Spring Scale
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(ColorTokens.darkSurfaceVariant)
-                    .aspectRatio(1, contentMode: .fit)
-                    .padding(.horizontal, 32)
-                    .overlay(
-                        Image(systemName: "music.note")
-                            .font(.system(size: 80))
-                            .foregroundColor(ColorTokens.primaryAccent)
+                if let song = playerService.currentSong {
+                    SongArtworkView(
+                        artworkURL: song.artworkURL,
+                        size: 280,
+                        cornerRadius: 24,
+                        iconSize: 80
                     )
-                    .scaleEffect(playerService.isPlaying ? 1.0 : 0.88)
+                    .scaleEffect(playerService.isPlaying ? 1.0 : 0.90)
                     .animation(.spring(response: 0.45, dampingFraction: 0.7), value: playerService.isPlaying)
-                    .shadow(color: Color.black.opacity(0.5), radius: 25, x: 0, y: 15)
+                    .shadow(color: Color.black.opacity(0.6), radius: 30, x: 0, y: 16)
+                }
                 
                 Spacer()
                 
@@ -67,7 +93,7 @@ public struct NowPlayingView: View {
                         
                         Text(song.artist)
                             .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(ColorTokens.textSecondary)
+                            .foregroundColor(ColorTokens.primaryAccent)
                             .lineLimit(1)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -140,6 +166,13 @@ public struct NowPlayingView: View {
                 .padding(.bottom, 36)
             }
         }
+        .gesture(
+            DragGesture().onEnded { val in
+                if val.translation.height > 80 {
+                    dismiss()
+                }
+            }
+        )
         .sheet(isPresented: $showingSleepTimerSheet) {
             SleepTimerSheet()
                 .presentationDetents([.fraction(0.4)])

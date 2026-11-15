@@ -1,12 +1,31 @@
 import Foundation
 import MediaPlayer
 import AVFoundation
+import UIKit
 import UniformTypeIdentifiers
 
 public class LocalAudioScanner {
     public static let shared = LocalAudioScanner()
     
     private init() {}
+    
+    // MARK: - Lưu ảnh bìa (Cover Art) vào thư mục Caches
+    private func saveArtworkToCache(data: Data, id: String) -> URL? {
+        guard let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else { return nil }
+        let artDir = cacheDir.appendingPathComponent("Artworks", isDirectory: true)
+        if !FileManager.default.fileExists(atPath: artDir.path) {
+            try? FileManager.default.createDirectory(at: artDir, withIntermediateDirectories: true)
+        }
+        let safeId = id.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? UUID().uuidString
+        let fileURL = artDir.appendingPathComponent("\(safeId).jpg")
+        do {
+            try data.write(to: fileURL)
+            return fileURL
+        } catch {
+            print("Lỗi lưu ảnh bìa vào cache: \(error)")
+            return nil
+        }
+    }
     
     // MARK: - 1. Cấp quyền truy cập Thư viện Apple Music của máy
     public func requestMediaPermissionIfNeeded() async -> Bool {
@@ -87,20 +106,26 @@ public class LocalAudioScanner {
             
             // Bỏ qua các hiệu ứng âm thanh quá ngắn (< 3 giây)
             if durationSeconds > 0 && durationSeconds < 3.0 { continue }
-            if durationSeconds <= 0 { durationSeconds = 180.0 }
             
             var title = fileURL.deletingPathExtension().lastPathComponent
             var artist = "Không xác định"
             var album = "Tệp ngoại tuyến"
+            var artworkURL: URL? = nil
             
             if let metadata = try? await asset.load(.commonMetadata) {
                 for item in metadata {
-                    guard let commonKey = item.commonKey?.rawValue, let value = try? await item.load(.stringValue) else { continue }
-                    switch commonKey {
-                    case "title": if !value.isEmpty { title = value }
-                    case "artist": if !value.isEmpty { artist = value }
-                    case "albumName": if !value.isEmpty { album = value }
-                    default: break
+                    guard let commonKey = item.commonKey?.rawValue else { continue }
+                    
+                    if commonKey == "title", let value = try? await item.load(.stringValue), !value.isEmpty {
+                        title = value
+                    } else if commonKey == "artist", let value = try? await item.load(.stringValue), !value.isEmpty {
+                        artist = value
+                    } else if commonKey == "albumName", let value = try? await item.load(.stringValue), !value.isEmpty {
+                        album = value
+                    } else if commonKey == AVMetadataKey.commonKeyArtwork.rawValue || commonKey == "artwork" {
+                        if let artData = try? await item.load(.dataValue) {
+                            artworkURL = saveArtworkToCache(data: artData, id: fileURL.lastPathComponent)
+                        }
                     }
                 }
             }
@@ -112,7 +137,7 @@ public class LocalAudioScanner {
                 album: album,
                 duration: durationSeconds,
                 fileURL: fileURL,
-                artworkURL: nil
+                artworkURL: artworkURL
             )
             songs.append(song)
         }
@@ -137,6 +162,13 @@ public class LocalAudioScanner {
             // Chỉ lấy các bài hát ngoại tuyến có assetURL phát được
             guard let url = item.assetURL else { continue }
             
+            var artworkURL: URL? = nil
+            if let artwork = item.artwork,
+               let img = artwork.image(at: CGSize(width: 400, height: 400)),
+               let data = img.jpegData(compressionQuality: 0.8) {
+                artworkURL = saveArtworkToCache(data: data, id: "media_\(item.persistentID)")
+            }
+            
             let song = Song(
                 id: String(item.persistentID),
                 title: item.title ?? "Không tên",
@@ -144,7 +176,7 @@ public class LocalAudioScanner {
                 album: item.albumTitle ?? "Không xác định",
                 duration: item.playbackDuration > 0 ? item.playbackDuration : 180.0,
                 fileURL: url,
-                artworkURL: nil
+                artworkURL: artworkURL
             )
             songs.append(song)
         }

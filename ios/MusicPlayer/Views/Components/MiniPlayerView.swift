@@ -8,13 +8,7 @@ public struct MiniPlayerView: View {
         if let song = playerService.currentSong {
             HStack(spacing: 12) {
                 // Album Art
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(ColorTokens.darkSurfaceVariant)
-                    .frame(width: 48, height: 48)
-                    .overlay(
-                        Image(systemName: "music.note")
-                            .foregroundColor(ColorTokens.primaryAccent)
-                    )
+                SongArtworkView(artworkURL: song.artworkURL, size: 48, cornerRadius: 8, iconSize: 22)
                 
                 // Track Info
                 VStack(alignment: .leading, spacing: 2) {

@@ -175,6 +175,11 @@ public class AudioPlayerService: ObservableObject {
         info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
         info[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
         
+        if let artURL = song.artworkURL, let img = UIImage(contentsOfFile: artURL.path) {
+            let artwork = MPMediaItemArtwork(boundsSize: img.size) { _ in img }
+            info[MPMediaItemPropertyArtwork] = artwork
+        }
+        
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
     

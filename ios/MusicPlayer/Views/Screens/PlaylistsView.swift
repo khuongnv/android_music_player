@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct PlaylistsView: View {
     @ObservedObject var storage = StorageManager.shared
+    @Environment(\.dismiss) private var dismiss
     @State private var showingCreateAlert = false
     @State private var newPlaylistName = ""
     
@@ -51,6 +52,17 @@ public struct PlaylistsView: View {
         }
         .navigationTitle("Danh sách phát")
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .bold))
+                        Text("Thư viện")
+                    }
+                    .foregroundColor(ColorTokens.primaryAccent)
+                }
+            }
+            
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     newPlaylistName = ""

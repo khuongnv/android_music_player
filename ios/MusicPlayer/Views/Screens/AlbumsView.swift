@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct AlbumsView: View {
     var songs: [Song]
+    @Environment(\.dismiss) private var dismiss
     
     private var albums: [Album] {
         var dict = [String: [Song]]()
@@ -9,11 +10,13 @@ public struct AlbumsView: View {
             dict[song.album, default: []].append(song)
         }
         return dict.map { (albumTitle, songList) in
-            Album(
+            // Lấy bài đầu tiên có artworkURL nếu có
+            let firstArt = songList.first(where: { $0.artworkURL != nil })?.artworkURL ?? songList.first?.artworkURL
+            return Album(
                 id: albumTitle,
                 title: albumTitle,
-                artist: songList.first?.artist ?? "Unknown Artist",
-                artworkURL: songList.first?.artworkURL,
+                artist: songList.first?.artist ?? "Không xác định",
+                artworkURL: firstArt,
                 songCount: songList.count
             )
         }.sorted { $0.title.localizedCompare($1.title) == .orderedAscending }
@@ -33,15 +36,13 @@ public struct AlbumsView: View {
                     ForEach(albums) { album in
                         NavigationLink(destination: AlbumDetailView(album: album, songs: songs.filter { $0.album == album.title })) {
                             VStack(alignment: .leading, spacing: 8) {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(ColorTokens.darkSurfaceVariant)
-                                    .aspectRatio(1, contentMode: .fit)
-                                    .overlay(
-                                        Image(systemName: "music.note")
-                                            .font(.system(size: 36))
-                                            .foregroundColor(ColorTokens.primaryAccent)
-                                    )
-                                    .shadow(color: Color.black.opacity(0.3), radius: 6, x: 0, y: 3)
+                                SongArtworkView(
+                                    artworkURL: album.artworkURL,
+                                    size: 160,
+                                    cornerRadius: 12,
+                                    iconSize: 40
+                                )
+                                .shadow(color: Color.black.opacity(0.35), radius: 8, x: 0, y: 4)
                                 
                                 Text(album.title)
                                     .font(.system(size: 15, weight: .semibold))
@@ -58,9 +59,21 @@ public struct AlbumsView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
-                .padding(.bottom, 70)
+                .padding(.bottom, 80)
             }
         }
         .navigationTitle("Album (\(albums.count))")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .bold))
+                        Text("Thư viện")
+                    }
+                    .foregroundColor(ColorTokens.primaryAccent)
+                }
+            }
+        }
     }
 }

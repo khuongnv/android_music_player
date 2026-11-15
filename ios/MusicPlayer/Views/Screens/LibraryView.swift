@@ -116,13 +116,7 @@ public struct LibraryView: View {
                                     LazyVStack(spacing: 0) {
                                         ForEach(songs.prefix(50)) { song in
                                             HStack(spacing: 14) {
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .fill(ColorTokens.darkSurfaceVariant)
-                                                    .frame(width: 44, height: 44)
-                                                    .overlay(
-                                                        Image(systemName: "music.note")
-                                                            .foregroundColor(ColorTokens.primaryAccent)
-                                                    )
+                                                SongArtworkView(artworkURL: song.artworkURL, size: 44, cornerRadius: 8, iconSize: 20)
                                                 
                                                 VStack(alignment: .leading, spacing: 3) {
                                                     Text(song.title)

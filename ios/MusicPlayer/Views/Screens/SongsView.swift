@@ -3,6 +3,7 @@ import SwiftUI
 public struct SongsView: View {
     var songs: [Song]
     @ObservedObject var playerService = AudioPlayerService.shared
+    @Environment(\.dismiss) private var dismiss
     
     @State private var searchText: String = ""
     @State private var sortOption: SortOption = .title
@@ -83,13 +84,7 @@ public struct SongsView: View {
                 List {
                     ForEach(filteredSongs) { song in
                         HStack(spacing: 14) {
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(ColorTokens.darkSurfaceVariant)
-                                .frame(width: 44, height: 44)
-                                .overlay(
-                                    Image(systemName: "music.note")
-                                        .foregroundColor(ColorTokens.primaryAccent)
-                                )
+                            SongArtworkView(artworkURL: song.artworkURL, size: 44, cornerRadius: 8, iconSize: 20)
                             
                             VStack(alignment: .leading, spacing: 3) {
                                 Text(song.title)
@@ -130,6 +125,18 @@ public struct SongsView: View {
             }
         }
         .navigationTitle("Bài hát (\(songs.count))")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .bold))
+                        Text("Thư viện")
+                    }
+                    .foregroundColor(ColorTokens.primaryAccent)
+                }
+            }
+        }
     }
     
     private func formatDuration(_ duration: TimeInterval) -> String {

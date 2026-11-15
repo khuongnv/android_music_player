@@ -4,6 +4,7 @@ public struct AlbumDetailView: View {
     var album: Album
     var songs: [Song]
     @ObservedObject var playerService = AudioPlayerService.shared
+    @Environment(\.dismiss) private var dismiss
     
     public var body: some View {
         ZStack {
@@ -12,16 +13,14 @@ public struct AlbumDetailView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     // Big Artwork Header
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(ColorTokens.darkSurfaceVariant)
-                        .frame(width: 200, height: 200)
-                        .overlay(
-                            Image(systemName: "music.note")
-                                .font(.system(size: 60))
-                                .foregroundColor(ColorTokens.primaryAccent)
-                        )
-                        .shadow(color: Color.black.opacity(0.4), radius: 16, x: 0, y: 8)
-                        .padding(.top, 20)
+                    SongArtworkView(
+                        artworkURL: album.artworkURL,
+                        size: 200,
+                        cornerRadius: 16,
+                        iconSize: 60
+                    )
+                    .shadow(color: Color.black.opacity(0.45), radius: 16, x: 0, y: 8)
+                    .padding(.top, 20)
                     
                     VStack(spacing: 4) {
                         Text(album.title)
@@ -84,6 +83,13 @@ public struct AlbumDetailView: View {
                                     .foregroundColor(ColorTokens.textSecondary)
                                     .frame(width: 24, alignment: .trailing)
                                 
+                                SongArtworkView(
+                                    artworkURL: song.artworkURL,
+                                    size: 38,
+                                    cornerRadius: 6,
+                                    iconSize: 16
+                                )
+                                
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(song.title)
                                         .font(.system(size: 15, weight: .medium))
@@ -103,7 +109,7 @@ public struct AlbumDetailView: View {
                                     .foregroundColor(ColorTokens.textSecondary)
                             }
                             .padding(.horizontal, 24)
-                            .padding(.vertical, 12)
+                            .padding(.vertical, 10)
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 playerService.play(songs: songs, startIndex: index)
@@ -112,14 +118,27 @@ public struct AlbumDetailView: View {
                             
                             Divider()
                                 .background(ColorTokens.hairlineDivider)
-                                .padding(.leading, 64)
+                                .padding(.leading, 78)
                         }
                     }
                     .padding(.top, 10)
+                    .padding(.bottom, 80)
                 }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .bold))
+                        Text("Album")
+                    }
+                    .foregroundColor(ColorTokens.primaryAccent)
+                }
+            }
+        }
     }
     
     private func formatDuration(_ duration: TimeInterval) -> String {

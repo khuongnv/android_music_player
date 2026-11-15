@@ -68,8 +68,11 @@ public class StorageManager: ObservableObject {
             songId: song.id,
             songTitle: song.title,
             artistName: song.artist,
+            albumName: song.album,
+            duration: song.duration,
             timestamp: Date(),
-            playbackPosition: position
+            playbackPosition: position,
+            artworkURL: song.artworkURL
         )
         // Lưu lịch sử trong vòng 24 giờ
         let twentyFourHoursAgo = Date().addingTimeInterval(-24 * 3600)
