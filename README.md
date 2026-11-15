@@ -49,7 +49,7 @@ android-music-player/
 │   └── rules/                       # Quy tắc thiết kế UI/UX Apple Music bắt buộc
 │
 ├── Docs/                            # Tài liệu kỹ thuật, Epics & Audit Logs
-│   ├── dev-ios/                     # Hồ sơ chứng chỉ Enterprise VNPT, Mobileprovision
+│   ├── dev-ios/                     # (Local-only, gitignored) Hồ sơ chứng chỉ ký số nội bộ
 │   ├── logs/                        # Nhật ký thực thi chi tiết (Bắt buộc theo AGENTS.md)
 │   │   ├── README.md                # Danh mục tổng hợp tất cả các phiên làm việc
 │   │   └── YYYY-MM-DD_<task>.md     # Chi tiết từng tính năng / bản sửa lỗi

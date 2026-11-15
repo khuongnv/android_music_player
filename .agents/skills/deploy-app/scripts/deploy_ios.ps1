@@ -24,10 +24,16 @@ param(
     [string]$MacUser = "khuongnv",
 
     [Parameter(Mandatory = $false)]
-    [string]$ChannelId = "-1003609918702",
+    [string]$ChannelId = "",
 
     [Parameter(Mandatory = $false)]
-    [string]$BotToken = "8005142785:AAHSrJ2Yp4l0Gj6Yk7iu8hwSwThZIiVKrCU",
+    [string]$BotToken = "",
+
+    [Parameter(Mandatory = $false)]
+    [string]$P12Password = "",
+
+    [Parameter(Mandatory = $false)]
+    [string]$KeychainPassword = "",
 
     [switch]$SkipBuild
 )
@@ -38,6 +44,17 @@ try {
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..\..")).Path
 Set-Location $repoRoot
+
+# Tự động nạp cấu hình bí mật cục bộ nếu tồn tại
+$localSecrets = Join-Path $repoRoot ".secrets.ps1"
+if (Test-Path $localSecrets) {
+    . $localSecrets
+}
+
+if ([string]::IsNullOrWhiteSpace($ChannelId)) { $ChannelId = $env:TELEGRAM_CHANNEL_ID }
+if ([string]::IsNullOrWhiteSpace($BotToken)) { $BotToken = $env:TELEGRAM_BOT_TOKEN }
+if ([string]::IsNullOrWhiteSpace($P12Password)) { $P12Password = $env:IOS_P12_PASSWORD }
+if ([string]::IsNullOrWhiteSpace($KeychainPassword)) { $KeychainPassword = $env:MAC_KEYCHAIN_PASSWORD }
 
 $infoPlistPath = Join-Path $repoRoot "ios\MusicPlayer\Resources\Info.plist"
 
@@ -138,14 +155,14 @@ if (-not $SkipBuild) {
 
     # Unlock Keychain và kiểm tra identity
     $keychainCmds = @"
-security unlock-keychain -p "1230" ~/Library/Keychains/login.keychain-db 2>/dev/null || true
-if ! security find-identity -v -p codesigning | grep -q "JPMH34L85K"; then
+security unlock-keychain -p "$KeychainPassword" ~/Library/Keychains/login.keychain-db 2>/dev/null || true
+if ! security find-identity -v -p codesigning | grep -q "$teamId"; then
     echo ">>> Import chứng chỉ Enterprise vào Keychain..."
-    security import ~/musicplayer-build/certs/VNPT_Enterprise.p12 -k ~/Library/Keychains/login.keychain-db -P "RW2ynhz#1w@Z" -T /usr/bin/codesign -T /usr/bin/security 2>/dev/null || true
+    security import ~/musicplayer-build/certs/VNPT_Enterprise.p12 -k ~/Library/Keychains/login.keychain-db -P "$P12Password" -T /usr/bin/codesign -T /usr/bin/security 2>/dev/null || true
 else
-    echo ">>> Chứng chỉ Enterprise VNPT (JPMH34L85K) đã sẵn sàng trong Keychain."
+    echo ">>> Chứng chỉ Enterprise VNPT ($teamId) đã sẵn sàng trong Keychain."
 fi
-security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "1230" ~/Library/Keychains/login.keychain-db 2>/dev/null || true
+security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KeychainPassword" ~/Library/Keychains/login.keychain-db 2>/dev/null || true
 security find-identity -v -p codesigning
 "@
     $keychainResult = ssh -o StrictHostKeyChecking=no "$MacUser@$MacHost" $keychainCmds

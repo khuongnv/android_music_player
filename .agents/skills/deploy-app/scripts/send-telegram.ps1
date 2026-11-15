@@ -9,10 +9,10 @@
     [string]$ResultStatus = "Thành công",
 
     [Parameter(Mandatory = $false)]
-    [string]$ChannelId = "-1003609918702",
+    [string]$ChannelId = "",
 
     [Parameter(Mandatory = $false)]
-    [string]$BotToken = "8005142785:AAHSrJ2Yp4l0Gj6Yk7iu8hwSwThZIiVKrCU",
+    [string]$BotToken = "",
 
     [Parameter(Mandatory = $false)]
     [string]$ParseMode = "HTML",
@@ -30,6 +30,15 @@
 try {
     [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 } catch {}
+
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..\..")).Path
+$localSecrets = Join-Path $repoRoot ".secrets.ps1"
+if (Test-Path $localSecrets) {
+    . $localSecrets
+}
+
+if ([string]::IsNullOrWhiteSpace($ChannelId)) { $ChannelId = $env:TELEGRAM_CHANNEL_ID }
+if ([string]::IsNullOrWhiteSpace($BotToken)) { $BotToken = $env:TELEGRAM_BOT_TOKEN }
 
 $iconRocket  = [char]::ConvertFromUtf32(0x1F680) # 🚀 Rocket
 $iconSuccess = [char]::ConvertFromUtf32(0x2705)  # ✅ Checkmark

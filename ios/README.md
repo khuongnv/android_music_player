@@ -35,11 +35,11 @@ ios/MusicPlayer/
 2. **Cấu hình Signing & Capabilities**:
    - **Bundle Identifier**: Đặt chính xác là `com.dhtthni.dhxe`
    - **Team**: Chọn Team có ID `JPMH34L85K` (`VIETNAM POSTS AND TELECOMMUNICATIONS GROUP - HO CHI MINH CITY TELECOM BRANCH`).
-   - **Certificate**: Cài đặt file chứng chỉ [`docs/dev-ios/VNPT_Enterprise_iOS Distribution_18082029.p12`](../docs/dev-ios/VNPT_Enterprise_iOS%20Distribution_18082029.p12) vào macOS Keychain (Hạn dùng: 18/08/2029).
-   - **Provisioning Profile**: Chọn cấu hình Manual Signing và trỏ tới file profile [`docs/dev-ios/Prov_HNI_comdhtthnidhxe.mobileprovision`](../docs/dev-ios/Prov_HNI_comdhtthnidhxe.mobileprovision) (Name: `Prov_HNI_com.dhtthni.dhxe`, UUID: `309d9c0d-3f81-40ab-919f-e9c4a6405773`).
+   - **Certificate**: Cài đặt file chứng chỉ Enterprise In-House `.p12` vào macOS Keychain (Hạn dùng: 18/08/2029).
+   - **Provisioning Profile**: Chọn cấu hình Manual Signing và trỏ tới file profile `Prov_HNI_com.dhtthni.dhxe` (UUID: `309d9c0d-3f81-40ab-919f-e9c4a6405773`).
 3. **Chạy ứng dụng**:
    - Chọn thiết bị iPhone thật hoặc Simulator (iOS 15.0 trở lên) và nhấn **Run** (Cmd + R).
 4. **Đóng gói phát hành In-House OTA**:
    - Archive và Export ứng dụng chọn hình thức **Enterprise Distribution**.
-   - Sử dụng mẫu [`docs/dev-ios/manifest.plist.example`](../docs/dev-ios/manifest.plist.example) để cấu hình đường dẫn cài đặt không dây OTA qua `itms-services://`.
+   - Cấu hình file `manifest.plist` để phân phối không dây OTA qua `itms-services://`.
 

@@ -17,8 +17,8 @@ Dự án iOS sử dụng bộ chứng chỉ và cấu hình ký số doanh nghi�
 | **App ID Prefix / Team ID** | `JPMH34L85K` | Apple Developer Team Identifier |
 | **Application Identifier** | `JPMH34L85K.com.dhtthni.dhxe` | App ID đầy đủ được Apple cấp phép trong Profile |
 | **Doanh nghiệp sở hữu (Team Name)** | `VIETNAM POSTS AND TELECOMMUNICATIONS GROUP - HO CHI MINH CITY TELECOM BRANCH` | Đơn vị chủ quản Enterprise Account (VNPT TP.HCM) |
-| **Tệp Chứng chỉ (.p12)** | [`VNPT_Enterprise_iOS Distribution_18082029.p12`](../docs/dev-ios/VNPT_Enterprise_iOS%20Distribution_18082029.p12) | Chứng chỉ phân phối In-House (Hạn dùng: **18/08/2029**) |
-| **Tệp Provisioning Profile** | [`Prov_HNI_comdhtthnidhxe.mobileprovision`](../docs/dev-ios/Prov_HNI_comdhtthnidhxe.mobileprovision) | Profile In-House: `Prov_HNI_com.dhtthni.dhxe` |
+| **Tệp Chứng chỉ (.p12)** | `VNPT_Enterprise_iOS Distribution_18082029.p12` *(Bảo mật cục bộ)* | Chứng chỉ phân phối In-House (Hạn dùng: **18/08/2029**) |
+| **Tệp Provisioning Profile** | `Prov_HNI_comdhtthnidhxe.mobileprovision` *(Bảo mật cục bộ)* | Profile In-House: `Prov_HNI_com.dhtthni.dhxe` |
 | **UUID Profile** | `309d9c0d-3f81-40ab-919f-e9c4a6405773` | UUID của Provisioning Profile (Hạn dùng: **21/10/2027**) |
 | **Loại phân phối (Distribution Type)** | **Universal In-House (`ProvisionsAllDevices = true`)** | Cài đặt được trên **mọi thiết bị iOS nội bộ**, không cần khai báo UDID |
 

@@ -18,3 +18,29 @@ local.properties
 ffmpeg.exe
 yt-dlp.exe
 Tuyệt thế dược thần/
+
+# ==========================================
+# SENSITIVE CERTIFICATES, KEYS & SECRETS
+# ==========================================
+Docs/dev-ios/
+docs/dev-ios/
+.secrets*
+*.secrets*
+*.env
+*.env.*
+*.p12
+*.mobileprovision
+*.cer
+*.key
+*.pem
+*.p8
+*.jks
+*.keystore
+!android/app/keystore/debug.keystore
+
+# Local build archives
+*.ipa
+ios_src.tar.gz
+test_ios.tar.gz
+releases/ios_src.tar.gz
+releases/test_ios.tar.gz
