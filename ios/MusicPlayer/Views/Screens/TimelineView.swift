@@ -67,7 +67,7 @@ public struct TimelineView: View {
                                 .padding(.horizontal, 20)
                             }
                         }
-                        .padding(.bottom, 80)
+                        .padding(.bottom, 140)
                     }
                 }
             }

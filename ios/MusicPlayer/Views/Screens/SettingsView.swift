@@ -113,6 +113,12 @@ public struct SettingsView: View {
                         }
                     }
                     .listRowBackground(ColorTokens.darkSurface)
+                    
+                    Section {
+                        Spacer()
+                            .frame(height: 70)
+                    }
+                    .listRowBackground(Color.clear)
                 }
                 .background(ColorTokens.amoledBlack)
             }

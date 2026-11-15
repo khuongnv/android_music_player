@@ -118,6 +118,11 @@ public struct SongsView: View {
                             }
                         }
                     }
+                    
+                    // Padding khoảng trống dưới cùng
+                    Spacer()
+                        .frame(height: 70)
+                        .listRowBackground(Color.clear)
                 }
                 .listStyle(.plain)
                 .background(ColorTokens.amoledBlack)

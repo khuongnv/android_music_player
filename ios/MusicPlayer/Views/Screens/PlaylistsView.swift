@@ -41,6 +41,10 @@ public struct PlaylistsView: View {
                         storage.deletePlaylist(id: p.id)
                     }
                 }
+                
+                Spacer()
+                    .frame(height: 70)
+                    .listRowBackground(Color.clear)
             }
             .listStyle(.plain)
             .background(ColorTokens.amoledBlack)

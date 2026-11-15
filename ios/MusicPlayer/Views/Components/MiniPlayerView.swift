@@ -53,8 +53,7 @@ public struct MiniPlayerView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
-            .liquidGlass(cornerRadius: 14)
-            .padding(.horizontal, 12)
+            .liquidGlass(cornerRadius: 16)
             .contentShape(Rectangle())
             .onTapGesture {
                 onExpand()

@@ -56,7 +56,9 @@ public struct AlbumsView: View {
                         }
                     }
                 }
-                .padding(16)
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 70)
             }
         }
         .navigationTitle("Album (\(albums.count))")
