@@ -204,15 +204,16 @@ struct SleepTimerSheet: View {
                 
                 HStack(spacing: 12) {
                     ForEach(intervals, id: \.self) { mins in
+                        let isSelected = timer.isActive && (timer.selectedPresetMinutes == mins)
                         Button("\(mins)m") {
                             timer.startTimer(minutes: mins)
                             dismiss()
                         }
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: 15, weight: isSelected ? .bold : .semibold))
                         .padding(.vertical, 10)
                         .padding(.horizontal, 16)
-                        .background(ColorTokens.darkSurfaceVariant)
-                        .foregroundColor(ColorTokens.textPrimary)
+                        .background(isSelected ? ColorTokens.primaryAccent : ColorTokens.darkSurfaceVariant)
+                        .foregroundColor(isSelected ? .white : ColorTokens.textPrimary)
                         .cornerRadius(10)
                     }
                 }

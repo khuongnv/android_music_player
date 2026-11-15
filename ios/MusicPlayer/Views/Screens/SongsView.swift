@@ -116,7 +116,7 @@ public struct SongsView: View {
                     
                     // Padding khoảng trống dưới cùng
                     Spacer()
-                        .frame(height: 70)
+                        .frame(height: 120)
                         .listRowBackground(Color.clear)
                 }
                 .listStyle(.plain)

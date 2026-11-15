@@ -44,7 +44,7 @@ public struct PlaylistsView: View {
                 }
                 
                 Spacer()
-                    .frame(height: 70)
+                    .frame(height: 120)
                     .listRowBackground(Color.clear)
             }
             .listStyle(.plain)

@@ -92,6 +92,15 @@ public class AudioPlayerService: ObservableObject {
         updateNowPlayingPlaybackState()
     }
     
+    public func pause() {
+        guard let player = player else { return }
+        if isPlaying {
+            player.pause()
+            isPlaying = false
+            updateNowPlayingPlaybackState()
+        }
+    }
+    
     public func seek(to time: TimeInterval) {
         let cmTime = CMTime(seconds: time, preferredTimescale: 600)
         player?.seek(to: cmTime) { [weak self] _ in

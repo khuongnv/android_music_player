@@ -8,6 +8,7 @@ Thư mục này lưu trữ toàn bộ nhật ký chi tiết về các bước th
 
 | Ngày | Tên Tệp Log | Nhiệm Vụ / Tính Năng | Agent Phụ Trách | Trạng Thái |
 | :--- | :--- | :--- | :--- | :--- |
+| 2026-11-15 | [`2026-11-15_implement_ios_settings_sleep_timer_and_expand_menubar.md`](./2026-11-15_implement_ios_settings_sleep_timer_and_expand_menubar.md) | Bổ sung Hẹn giờ ngủ (Sleep Timer) trong Cài đặt chuẩn Android & Tối ưu kích thước Menu Bar cân đối | `lead-architect` | ✅ Hoàn thành |
 | 2026-11-15 | [`2026-11-15_audit_android_parity_navigation_timeline_and_cover_art.md`](./2026-11-15_audit_android_parity_navigation_timeline_and_cover_art.md) | Rà soát đối chiếu Android, hoàn thiện điều hướng Back, nâng cấp giao diện Ký ức (Timeline) và trích xuất hiển thị Ảnh bìa (Cover Art) | `lead-architect` | ✅ Hoàn thành |
 | 2026-11-15 | [`2026-11-15_fix_ios_menubar_icon_size_and_music_scanner.md`](./2026-11-15_fix_ios_menubar_icon_size_and_music_scanner.md) | Tối ưu thanh menu bar full width bo cong, sửa icon app full-bleed không bị nhỏ, và hoàn thiện bộ quét nhạc MediaLibrary & Documents | `compose-ui-specialist` | ✅ Hoàn thành |
 | 2026-11-15 | [`2026-11-15_fix_ios_icon_display_name_and_screen_ratio.md`](./2026-11-15_fix_ios_icon_display_name_and_screen_ratio.md) | Khắc phục App Icon, đổi tên hiển thị thành Music và hỗ trợ toàn màn hình trên iPhone và iPad Air | `compose-ui-specialist` | ✅ Hoàn thành |
