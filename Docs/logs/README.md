@@ -8,7 +8,7 @@ Thư mục này lưu trữ toàn bộ nhật ký chi tiết về các bước th
 
 | Ngày | Tên Tệp Log | Nhiệm Vụ / Tính Năng | Agent Phụ Trách | Trạng Thái |
 | :--- | :--- | :--- | :--- | :--- |
-| 2026-11-15 | [`2026-11-15_fix_ios_menubar_icon_size_and_music_scanner.md`](./2026-11-15_fix_ios_menubar_icon_size_and_music_scanner.md) | Tối ưu thanh menu bar full width bo cong, sửa icon app full-bleed không bị nhỏ, và hoàn thiện bộ quét nhạc MediaLibrary & Documents | `compose-ui-specialist` | 🔄 Đang tiến hành |
+| 2026-11-15 | [`2026-11-15_fix_ios_menubar_icon_size_and_music_scanner.md`](./2026-11-15_fix_ios_menubar_icon_size_and_music_scanner.md) | Tối ưu thanh menu bar full width bo cong, sửa icon app full-bleed không bị nhỏ, và hoàn thiện bộ quét nhạc MediaLibrary & Documents | `compose-ui-specialist` | ✅ Hoàn thành |
 | 2026-11-15 | [`2026-11-15_fix_ios_icon_display_name_and_screen_ratio.md`](./2026-11-15_fix_ios_icon_display_name_and_screen_ratio.md) | Khắc phục App Icon, đổi tên hiển thị thành Music và hỗ trợ toàn màn hình trên iPhone và iPad Air | `compose-ui-specialist` | ✅ Hoàn thành |
 | 2026-11-15 | [`2026-11-15_implement_ios_and_deploy.md`](./2026-11-15_implement_ios_and_deploy.md) | Triển khai toàn diện ứng dụng iOS SwiftUI và thực thi deploy phát hành Enterprise In-House v1.0.0 | Tất cả Swarm Agents | ✅ Hoàn thành |
 | 2026-11-15 | [`2026-11-15_setup_ios_deploy_and_ota_update.md`](./2026-11-15_setup_ios_deploy_and_ota_update.md) | Xây dựng deploy-app cho iOS Enterprise và giải pháp OTA App Update dựa trên `mdm-parental-control` | `lead-architect` | ✅ Hoàn thành |
