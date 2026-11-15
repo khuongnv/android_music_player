@@ -32,10 +32,35 @@ xcrun --sdk iphoneos swiftc \
 
 echo "Biên dịch binary thành công."
 
+echo ">>> 4b. Biên dịch Asset Catalog (AppIcon -> Assets.car)..."
+if [ -d "MusicPlayer/Resources/Assets.xcassets" ]; then
+  xcrun actool MusicPlayer/Resources/Assets.xcassets \
+    --compile build/ipa/Payload/MusicPlayer.app \
+    --platform iphoneos \
+    --minimum-deployment-target 16.0 \
+    --app-icon AppIcon \
+    --output-partial-info-plist build/assets-info.plist || true
+  echo "Asset catalog compiled."
+fi
+
+# Sao chép các icon PNG trực tiếp vào bundle root để đảm bảo 100% hiển thị
+if [ -d "MusicPlayer/Resources/Assets.xcassets/AppIcon.appiconset" ]; then
+  cp MusicPlayer/Resources/Assets.xcassets/AppIcon.appiconset/*.png build/ipa/Payload/MusicPlayer.app/ 2>/dev/null || true
+fi
+
+echo ">>> 4c. Biên dịch LaunchScreen.storyboard (Fix Letterbox & Tỷ lệ màn hình)..."
+if [ -f "MusicPlayer/Resources/LaunchScreen.storyboard" ]; then
+  xcrun ibtool --compile build/ipa/Payload/MusicPlayer.app/LaunchScreen.storyboardc \
+    MusicPlayer/Resources/LaunchScreen.storyboard || true
+  echo "LaunchScreen.storyboard compiled."
+fi
+
 echo ">>> 5. Cấu hình Info.plist & embedded.mobileprovision..."
 cp MusicPlayer/Resources/Info.plist build/ipa/Payload/MusicPlayer.app/Info.plist
 plutil -replace CFBundleExecutable -string "MusicPlayer" build/ipa/Payload/MusicPlayer.app/Info.plist
 plutil -replace CFBundleIdentifier -string "com.dhtthni.dhxe" build/ipa/Payload/MusicPlayer.app/Info.plist
+plutil -replace CFBundleDisplayName -string "Music" build/ipa/Payload/MusicPlayer.app/Info.plist
+plutil -replace CFBundleName -string "Music" build/ipa/Payload/MusicPlayer.app/Info.plist
 
 PROV_SRC="$HOME/musicplayer-build/certs/309d9c0d-3f81-40ab-919f-e9c4a6405773.mobileprovision"
 if [ ! -f "$PROV_SRC" ]; then

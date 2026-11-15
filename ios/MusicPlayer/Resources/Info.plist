@@ -7,13 +7,73 @@
     <key>CFBundleIdentifier</key>
     <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
     <key>CFBundleName</key>
-    <string>MusicPlayer</string>
+    <string>Music</string>
+    <key>CFBundleDisplayName</key>
+    <string>Music</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.0</string>
+    <string>1.0.1</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>2</string>
+    
+    <!-- Hỗ trợ Universal thiết bị iPhone (1) và iPad / iPad Air / iPad Pro (2) -->
+    <key>UIDeviceFamily</key>
+    <array>
+        <integer>1</integer>
+        <integer>2</integer>
+    </array>
+    
+    <!-- Đảm bảo kích thước toàn màn hình Native Retina / Liquid Retina (Không bị Letterbox) -->
+    <key>UILaunchStoryboardName</key>
+    <string>LaunchScreen</string>
+    <key>UILaunchScreen</key>
+    <dict/>
+    
+    <!-- Hướng màn hình xoay dọc và ngang cho iPhone & iPad -->
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>UIRequiresFullScreen</key>
+    <false/>
+    
+    <!-- Cấu hình App Icon dự phòng cho SpringBoard -->
+    <key>CFBundleIcons</key>
+    <dict>
+        <key>CFBundlePrimaryIcon</key>
+        <dict>
+            <key>CFBundleIconFiles</key>
+            <array>
+                <string>AppIcon60x60</string>
+            </array>
+            <key>CFBundleIconName</key>
+            <string>AppIcon</string>
+        </dict>
+    </dict>
+    <key>CFBundleIcons~ipad</key>
+    <dict>
+        <key>CFBundlePrimaryIcon</key>
+        <dict>
+            <key>CFBundleIconFiles</key>
+            <array>
+                <string>AppIcon60x60</string>
+                <string>AppIcon76x76</string>
+                <string>AppIcon83.5x83.5</string>
+            </array>
+            <key>CFBundleIconName</key>
+            <string>AppIcon</string>
+        </dict>
+    </dict>
     
     <!-- Cho phép chia sẻ file qua iTunes / Finder và ứng dụng Files (Tệp) -->
     <key>UIFileSharingEnabled</key>
@@ -32,4 +92,3 @@
     <string>Ứng dụng cần quyền đọc thư viện nhạc ngoại tuyến của bạn để phát các bài hát có trên thiết bị.</string>
 </dict>
 </plist>
-

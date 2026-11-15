@@ -62,7 +62,7 @@ if ([string]::IsNullOrWhiteSpace($Version)) {
 }
 
 $tag = "ios-v$Version"
-$releaseTitle = "Music Player iOS v$Version (Enterprise In-House)"
+$releaseTitle = "Music iOS v$Version (Enterprise In-House)"
 $bundleId = "com.dhtthni.dhxe"
 $profileUuid = "309d9c0d-3f81-40ab-919f-e9c4a6405773"
 $teamId = "JPMH34L85K"
@@ -91,7 +91,7 @@ Write-Host "==========================================================" -Foregro
 
 # ---------------- BƯỚC 1: ĐỒNG BỘ VERSION & KHỞI ĐỘNG ----------------
 $step1Title = "Bước 1: Khởi động phát hành iOS Enterprise"
-$step1Desc = "Ứng dụng: Music Player (iOS Enterprise - <code>$bundleId</code>)`nPhiên bản: <b>v$Version</b> (Tag: <code>$tag</code>)`nKênh phát hành: GitHub Releases & Apple OTA Manifest"
+$step1Desc = "Ứng dụng: Music (iOS Enterprise - <code>$bundleId</code>)`nPhiên bản: <b>v$Version</b> (Tag: <code>$tag</code>)`nKênh phát hành: GitHub Releases & Apple OTA Manifest"
 Write-Host ">>> $step1Title..." -ForegroundColor Yellow
 Send-TgStep -Title $step1Title -Message $step1Desc -Status "Đang khởi tạo cấu hình..."
 
@@ -224,7 +224,7 @@ $manifestContent = Get-Content -Path $manifestTemplatePath -Raw -Encoding UTF8
 $manifestContent = $manifestContent -replace '\{\{IPA_URL\}\}', $ipaDownloadUrl
 $manifestContent = $manifestContent -replace '\{\{BUNDLE_ID\}\}', $bundleId
 $manifestContent = $manifestContent -replace '\{\{VERSION\}\}', $Version
-$manifestContent = $manifestContent -replace '\{\{TITLE\}\}', "Music Player"
+$manifestContent = $manifestContent -replace '\{\{TITLE\}\}', "Music"
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($manifestDestPath, $manifestContent, $utf8NoBom)
 
@@ -280,7 +280,7 @@ if ($ghExe) {
 
 # ---------------- BƯỚC 6: TỔNG KẾT GỌN GÀNG KẾT HỢP ẢNH QR CODE CÀI ĐẶT ----------------
 $summaryContent = @"
-📱 <b>Ứng dụng:</b> Music Player iOS (<code>$bundleId</code>)
+📱 <b>Ứng dụng:</b> Music (<code>$bundleId</code>)
 🏷️ <b>Phiên bản:</b> <b>v$Version</b> (Git Tag: <code>$tag</code>)
 🔐 <b>Ký số:</b> VNPT Enterprise In-House (Team: <code>$teamId</code>)
 📦 <b>Dung lượng:</b> <b>$ipaSizeMb MB</b>
