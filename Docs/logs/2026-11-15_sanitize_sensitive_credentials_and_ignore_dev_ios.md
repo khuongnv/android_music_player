@@ -79,7 +79,7 @@
 - **Kiểm tra trạng thái Git tracking**:
   - `git ls-files Docs/dev-ios` trả về rỗng (hoàn toàn không còn theo dõi).
 - **Kiểm tra tệp nhạy cảm**:
-  - `git grep -i -E "(RW2ynhz|8005142785)"` trả về 0 kết quả trên toàn repository.
+  - `git grep` quét chuỗi mật khẩu và bot token trả về 0 kết quả trên toàn repository.
 - **Kiểm tra hoạt động cục bộ**:
   - Tệp `.p12` và `.mobileprovision` vẫn nguyên vẹn trên ổ đĩa máy tính cục bộ, sẵn sàng cho các lần build release tương lai mà không bị xóa mất dữ liệu.
 
